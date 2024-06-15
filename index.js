@@ -36,9 +36,11 @@ mongoose.connect(process.env.MONGO_URI, {
 });
 
 
-app.get("/",(req,res)=>{
-    res.send("prod running")
-})
+app.get("/", (req, res) => {
+    console.log("Request to root path received");
+    res.send("prod running");
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes); // Use the profile routes
