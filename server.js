@@ -10,7 +10,20 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors()); // Use the cors middleware
+
+const corsOptions = {
+    // Replace with your domain
+    origin: 'https://workler-backend.vercel.app/',
+    methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
+  
+    // Enable this if you need to
+    // send cookies or HTTP authentication
+    credentials: true,
+    optionsSuccessStatus: 204
+  };
+
+  app.use(cors(corsOptions)); // Use the cors middleware
+
 
 const PORT = process.env.PORT || 5000;
 
