@@ -15,14 +15,12 @@ const corsOptions = {
     // Replace with your domain
     origin: 'https://workler-backend.vercel.app/',
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
-  
     // Enable this if you need to
     // send cookies or HTTP authentication
     credentials: true,
-    optionsSuccessStatus: 204
   };
 
-  app.use(cors(corsOptions)); // Use the cors middleware
+app.use(cors(corsOptions)); // Use the cors middleware
 
 
 const PORT = process.env.PORT || 5000;
@@ -37,6 +35,10 @@ mongoose.connect(process.env.MONGO_URI, {
     console.error('Failed to connect to MongoDB', err);
 });
 
+
+app.get("/",(req,res)=>{
+    res.send("prod running")
+})
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes); // Use the profile routes
