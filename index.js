@@ -93,7 +93,7 @@ app.get("/", (req, res) => {
     res.send("Full setup running with routes");
 });
 
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
 // app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes);
 
