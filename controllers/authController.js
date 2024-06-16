@@ -3,52 +3,49 @@ const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const config = require('../config'); // Ensure config is properly defined
 
-// exports.signup = async (req, res) => {
-//     const { email, password, username, birthDate, accountType } = req.body;
-//     try {
-//         const hashedPassword = await bcrypt.hash(password, 10);
-//         const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
-//         await user.save();
-//         console.log(`User created: ${user.email}`);
-//         res.status(201).send('User created successfully');
-//     } catch (error) {
-//         console.error('Error creating user:', error.message);
-//         res.status(400).send('Error creating user');
-//     }
-// };
-
-// exports.login = async (req, res) => {
-//     const { email, password } = req.body;
-//     try {
-//       // MongoDB connection
-//       const user = await User.findOne({ email });
-//       if (!user) {
-//         return res.status(404).send('User not found');
-//       }
-//       // Password validation
-//       const isPasswordValid = await bcrypt.compare(password, user.password);
-//       if (!isPasswordValid) {
-//         return res.status(400).send('Invalid password');
-//       }
-//       // JSON Web Token (JWT) generation
-//       const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '1h' });
-//       res.json({ token });
-//     } catch (error) {
-//       console.error(error);
-//       res.status(500).send('Server error');
-//     }
-//   };
-
-exports.checkEmail = async (req, res) => {
-    const { email } = req.body;
+exports.signup = async (req, res) => {
+    const { email, password, username, birthDate, accountType } = req.body;
     try {
-        const user = await User.findOne({ email });
-        res.json({ exists: !!user });
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
+        await user.save();
+        console.log(`User created: ${user.email}`);
+        res.status(201).send('User created successfully');
     } catch (error) {
-        console.error('Error checking email:', error.message);
-        res.status(500).send('Error checking email');
+        console.error('Error creating user:', error.message);
+        res.status(400).send('Error creating user');
     }
 };
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).send('Invalid password');
+        }
+        const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '1h' });
+        res.json({ token });
+    } catch (error) {
+        console.error('Login error:', error.message);
+        res.status(500).send('Server error');
+    }
+};
+
+// exports.checkEmail = async (req, res) => {
+//     const { email } = req.body;
+//     try {
+//         const user = await User.findOne({ email });
+//         res.json({ exists: !!user });
+//     } catch (error) {
+//         console.error('Error checking email:', error.message);
+//         res.status(500).send('Error checking email');
+//     }
+// };
 
 // exports.getUserDetails = async (req, res) => {
 //     try {
