@@ -12,7 +12,7 @@ exports.signup = async (req, res) => {
         console.log(`User created: ${user.email}`);
         res.status(201).send('User created successfully');
     } catch (error) {
-        console.error('Error creating user:', error.message);
+        console.error('Error creating user:', error);
         res.status(400).send('Error creating user');
     }
 };
