@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
-const config = require('../config'); // Ensure config is properly defined
+import { verify } from 'jsonwebtoken';
+import { findById } from '../models/userModel';
+import bcrypt from 'bcrypt';
+import { jwtSecret } from '../config'; // Ensure config is properly defined
 
 // exports.signup = async (req, res) => {
 //     const { email, password, username, birthDate, accountType } = req.body;
@@ -48,11 +48,11 @@ const config = require('../config'); // Ensure config is properly defined
 //     }
 // };
 
-exports.getUserDetails = async (req, res) => {
+export async function getUserDetails(req, res) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decoded = jwt.verify(token, config.jwtSecret);
-        const user = await User.findById(decoded.userId).select('-password');
+        const decoded = verify(token, jwtSecret);
+        const user = await findById(decoded.userId).select('-password');
         if (!user) {
             console.log(`User not found for details: ${decoded.userId}`);
             return res.status(404).send('User not found');
