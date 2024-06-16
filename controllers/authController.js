@@ -51,14 +51,15 @@ import { jwtSecret } from '../config'; // Ensure config is properly defined
 export async function getUserDetails(req, res) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decoded = verify(token, jwtSecret);
-        const user = await findById(decoded.userId).select('-password');
-        if (!user) {
-            console.log(`User not found for details: ${decoded.userId}`);
-            return res.status(404).send('User not found');
-        }
-        console.log(`User details fetched: ${user.email}`);
-        res.json(user);
+        console.log(token);
+        // const decoded = verify(token, jwtSecret);
+        // const user = await findById(decoded.userId).select('-password');
+        // if (!user) {
+        //     console.log(`User not found for details: ${decoded.userId}`);
+        //     return res.status(404).send('User not found');
+        // }
+        // console.log(`User details fetched: ${user.email}`);
+        // res.json(user);
     } catch (error) {
         console.error('Fetch user details error:', error.message);
         res.status(500).send('Error fetching user details');
