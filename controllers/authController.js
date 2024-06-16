@@ -1,4 +1,4 @@
-// const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 // const User = require('../models/userModel');
 // const bcrypt = require('bcrypt');
 // const config = require('../config'); // Ensure config is properly defined
@@ -17,18 +17,6 @@
 //     }
 // };
 
-exports.signup = async (req, res) => {
-    const { email, password, username, birthDate, accountType } = req.body;
-
-    console.log('Received signup request with data:');
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Username:', username);
-    console.log('Birth Date:', birthDate);
-    console.log('Account Type:', accountType);
-
-    res.status(200).send('Signup request received');
-};
 
 // exports.login = async (req, res) => {
 //     const { email, password } = req.body;
@@ -60,19 +48,19 @@ exports.signup = async (req, res) => {
 //     }
 // };
 
-// exports.getUserDetails = async (req, res) => {
-//     try {
-//         const token = req.headers.authorization.split(' ')[1];
-//         const decoded = jwt.verify(token, config.jwtSecret);
-//         const user = await User.findById(decoded.userId).select('-password');
-//         if (!user) {
-//             console.log(`User not found for details: ${decoded.userId}`);
-//             return res.status(404).send('User not found');
-//         }
-//         console.log(`User details fetched: ${user.email}`);
-//         res.json(user);
-//     } catch (error) {
-//         console.error('Fetch user details error:', error.message);
-//         res.status(500).send('Error fetching user details');
-//     }
-// }
+exports.getUserDetails = async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const decoded = jwt.verify(token, config.jwtSecret);
+        const user = await User.findById(decoded.userId).select('-password');
+        if (!user) {
+            console.log(`User not found for details: ${decoded.userId}`);
+            return res.status(404).send('User not found');
+        }
+        console.log(`User details fetched: ${user.email}`);
+        res.json(user);
+    } catch (error) {
+        console.error('Fetch user details error:', error.message);
+        res.status(500).send('Error fetching user details');
+    }
+}
