@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-    origin: process.env.CORS_ORIGIN || '*',
+    origin: '*',
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     credentials: true,
 };
