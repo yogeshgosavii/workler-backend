@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-// const User = require('../models/userModel');
-// const bcrypt = require('bcrypt');
-// const config = require('../config'); // Ensure config is properly defined
+const User = require('../models/userModel');
+const bcrypt = require('bcrypt');
+const config = require('../config'); // Ensure config is properly defined
 
 // exports.signup = async (req, res) => {
 //     const { email, password, username, birthDate, accountType } = req.body;
