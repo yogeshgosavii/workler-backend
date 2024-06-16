@@ -22,20 +22,20 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-if (!MONGO_URI) {
-    console.error('Error: MONGO_URI is not defined in environment variables');
-    process.exit(1);
-}
+// if (!MONGO_URI) {
+//     console.error('Error: MONGO_URI is not defined in environment variables');
+//     process.exit(1);
+// }
 
-mongoose.connect(MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    dbName: 'worklerData',
-}).then(() => {
-    console.log('Connected to MongoDB');
-}).catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-});
+// mongoose.connect(MONGO_URI, {
+//     useNewUrlParser: true,
+//     useUnifiedTopology: true,
+//     dbName: 'worklerData',
+// }).then(() => {
+//     console.log('Connected to MongoDB');
+// }).catch((err) => {
+//     console.error('Failed to connect to MongoDB', err);
+// });
 
 app.get("/", (req, res) => {
     console.log("Request to root path received");
