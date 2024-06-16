@@ -95,7 +95,7 @@ app.get("/", (req, res) => {
 
 // app.use('/api/auth', authRoutes);
 // app.use('/api/jobs', jobRoutes);
-app.use('/api/profile', profileRoutes);
+// app.use('/api/profile', profileRoutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
