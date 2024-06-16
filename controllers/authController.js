@@ -38,7 +38,7 @@ const User = require('../models/userModel');
 //     }
 // };
 
-exports.checkEmail = async (req, res) => {
+export async function checkEmail (req, res) {
     const { email } = req.body;
     try {
         const user = await User.findOne({ email });
