@@ -40,19 +40,20 @@ const User = require('../models/userModel');
 
 export async function checkEmail(req, res) {
     const { email } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (user) {
-            // Email exists in database
-            res.json({ exists: true });
-        } else {
-            // Email does not exist in database
-            res.json({ exists: false });
-        }
-    } catch (error) {
-        console.error('Error checking email:', error.message);
-        res.status(500).send('Error checking email');
-    }
+    console.log(email);
+    // try {
+    //     const user = await User.findOne({ email });
+    //     if (user) {
+    //         // Email exists in database
+    //         res.json({ exists: true });
+    //     } else {
+    //         // Email does not exist in database
+    //         res.json({ exists: false });
+    //     }
+    // } catch (error) {
+    //     console.error('Error checking email:', error.message);
+    //     res.status(500).send('Error checking email');
+    // }
 }
 
 export async function getUserDetails(req, res) {
