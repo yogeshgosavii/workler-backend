@@ -5,13 +5,14 @@ import User from '../models/userModel';
 
 export async function checkEmail(req, res) {
     const { email } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        res.json({ exists: !!user });
-    } catch (error) {
-        console.error('Error checking email:', error.message);
-        res.status(500).send('Error checking email');
-    }
+    console.log(email);
+    // try {
+    //     const user = await User.findOne({ email });
+    //     res.json({ exists: !!user });
+    // } catch (error) {
+    //     console.error('Error checking email:', error.message);
+    //     res.status(500).send('Error checking email');
+    // }
 }
 
 export async function getUserDetails(req, res) {
