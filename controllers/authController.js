@@ -1,10 +1,11 @@
-import { verify } from 'jsonwebtoken';
-import { findById } from '../models/userModel';
-// import bcrypt from 'bcrypt';
-const User = require('../models/userModel');
-import { jwtSecret } from '../config'; // Ensure config is properly defined
+import pkg from 'jsonwebtoken';
+const { verify, sign } = pkg; // Destructure the required methods from the imported package
 
-export async function signup (req, res){
+import User from '../models/userModel.js';
+import bcrypt from 'bcrypt';
+import { jwtSecret } from '../config.js';
+
+export async function signup(req, res) {
     const { email, password, username, birthDate, accountType } = req.body;
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,8 +19,7 @@ export async function signup (req, res){
     }
 };
 
-
-export async function login  (req, res){
+export async function login(req, res) {
     const { email, password } = req.body;
     try {
         const user = await User.findOne({ email });
@@ -30,7 +30,7 @@ export async function login  (req, res){
         if (!isPasswordValid) {
             return res.status(400).send('Invalid password');
         }
-        const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '1h' });
+        const token = sign({ userId: user._id }, jwtSecret, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
         console.error('Login error:', error.message);
@@ -38,7 +38,7 @@ export async function login  (req, res){
     }
 };
 
-export async function checkEmail (req, res) {
+export async function checkEmail(req, res) {
     const { email } = req.body;
     try {
         const user = await User.findOne({ email });
@@ -53,7 +53,7 @@ export async function getUserDetails(req, res) {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const decoded = verify(token, jwtSecret);
-        const user = await findById(decoded.userId).select('-password');
+        const user = await User.findById(decoded.userId).select('-password');
         if (!user) {
             console.log(`User not found for details: ${decoded.userId}`);
             return res.status(404).send('User not found');
@@ -64,4 +64,4 @@ export async function getUserDetails(req, res) {
         console.error('Fetch user details error:', error.message);
         res.status(500).send('Error fetching user details');
     }
-}
+};

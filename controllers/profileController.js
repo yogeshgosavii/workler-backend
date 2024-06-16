@@ -1,27 +1,60 @@
-import Skill, { find, findByIdAndUpdate, findByIdAndDelete } from '../models/skillModel';
-import Education from '../models/educationModel';
-import PersonalDetails, { find as _find, findByIdAndUpdate as _findByIdAndUpdate, findByIdAndDelete as _findByIdAndDelete } from '../models/personalDetailsModel';
-import ProjectDetails, { find as __find, findByIdAndUpdate as __findByIdAndUpdate, findByIdAndDelete as __findByIdAndDelete } from '../models/projectModel';
-import WorkExperience, { find as ___find, findByIdAndUpdate as ___findByIdAndUpdate, findByIdAndDelete as ___findByIdAndDelete } from '../models/workExperienceModel';
-import Description, { find as ____find, findByIdAndUpdate as ____findByIdAndUpdate, findByIdAndDelete as ____findByIdAndDelete } from '../models/descriptionModel';
 import bcrypt from 'bcrypt';
-import { sign } from 'jsonwebtoken';
-import { default as mongoose } from 'mongoose';
+import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import Skill from '../models/skillModel.js';
+import Education from '../models/educationModel.js';
+import PersonalDetails from '../models/personalDetailsModel.js';
+import ProjectDetails from '../models/projectModel.js';
+import WorkExperience from '../models/workExperienceModel.js';
+import Description from '../models/descriptionModel.js';
+import { jwtSecret } from '../config.js'; // Assuming you have JWT secret defined in config.js
 
 // Function to generate JWT token
 const generateToken = (userId) => {
-  return sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return jwt.sign({ userId }, jwtSecret, { expiresIn: '1h' });
 };
+
+// Example of protected route middleware to verify token
+export async function protect(req, res, next) {
+  let token;
+
+  // Check if token is present in headers
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    token = req.headers.authorization.split(' ')[1];
+  }
+
+  // If no token found
+  if (!token) {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+
+  try {
+    // Verify token
+    const decoded = jwt.verify(token, jwtSecret);
+
+    // Set user on request object for further use
+    req.user = { id: decoded.userId }; // Assuming you need only userId
+
+    next(); // Move to the next middleware
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: 'Not authorized, token failed' });
+  }
+}
 
 // Add Skill
 export async function addSkill(req, res) {
   try {
-    const {name,level} = req.body.skills;
-    console.log(name,level);
-    
-    const skill = new Skill({name,level});
+    const userId = req.user.id; // Get userId from authenticated request
+
+    const { name, level } = req.body.skills;
+    const skill = new Skill({ name, level });
+
+    // Example usage of generateToken with userId
+    const token = generateToken(userId);
+
     await skill.save();
-    res.status(201).json(skill);
+    res.status(201).json({ skill, token }); // Include token in response if needed
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
@@ -31,7 +64,7 @@ export async function addSkill(req, res) {
 // Get all Skills
 export async function getSkill(req, res) {
   try {
-    const skills = await find();
+    const skills = await Skill.find();
     res.json(skills);
   } catch (error) {
     console.error('Error:', error);
@@ -43,7 +76,7 @@ export async function getSkill(req, res) {
 export async function updateSkill(req, res) {
   try {
     const { id } = req.params;
-    const skill = await findByIdAndUpdate(id, req.body, { new: true });
+    const skill = await Skill.findByIdAndUpdate(id, req.body, { new: true });
     res.json(skill);
   } catch (error) {
     console.error('Error:', error);
@@ -54,25 +87,7 @@ export async function updateSkill(req, res) {
 // Add Education
 export async function addEducation(req, res) {
   try {
-    const {educationType, university, course, specialization, start_year, end_year, board, school_name, passing_out_year,grade, marks, maths, physics, chemistry } = req.body.education;
-
-    const education = new Education({
-      educationType,
-      university,
-      course,
-      grade,
-      specialization,
-      start_year,
-      end_year,
-      board,
-      school_name,
-      passing_out_year,
-      marks,
-      maths,
-      physics,
-      chemistry,
-    });
-
+    const education = new Education(req.body.education);
     await education.save();
     res.status(201).json(education);
   } catch (error) {
@@ -85,7 +100,6 @@ export async function addEducation(req, res) {
 export async function getEducation(req, res) {
   try {
     const educations = await Education.find();
-    console.log(educations);
     res.json(educations);
   } catch (error) {
     console.error('Error:', error);
@@ -95,34 +109,13 @@ export async function getEducation(req, res) {
 
 // Update Education
 export async function updateEducation(req, res) {
-
   try {
-    // Validate ObjectId
     const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ message: 'Invalid ID format' });
-    }
-
-    const educationData = req.body; // Directly using req.body now
-
-    // Log received data for debugging
-    console.log("Updating education with data:", educationData);
-
-    const updatedEducation = await Education.findByIdAndUpdate(id, educationData, { new: true });
-
-    if (!updatedEducation) {
-      return res.status(404).json({ message: 'Education with that ID not found' });
-    }
-
+    const updatedEducation = await Education.findByIdAndUpdate(id, req.body, { new: true });
     res.json(updatedEducation);
   } catch (error) {
     console.error('Error:', error);
-
-    if (error.name === 'ValidationError') {
-      return res.status(400).json({ message: error.message });
-    }
-
-    res.status(500).json({ message: 'Server Error' });
+    res.status(500).send('Server Error');
   }
 }
 
@@ -141,7 +134,7 @@ export async function addPersonalDetails(req, res) {
 // Get all Personal Details
 export async function getPersonalDetails(req, res) {
   try {
-    const personalDetails = await _find();
+    const personalDetails = await PersonalDetails.find();
     res.json(personalDetails);
   } catch (error) {
     console.error('Error:', error);
@@ -153,8 +146,8 @@ export async function getPersonalDetails(req, res) {
 export async function updatePersonalDetails(req, res) {
   try {
     const { id } = req.params;
-    const personalDetails = await _findByIdAndUpdate(id, req.body, { new: true });
-    res.json(personalDetails);
+    const updatedPersonalDetails = await PersonalDetails.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updatedPersonalDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
@@ -176,7 +169,7 @@ export async function addProjectDetails(req, res) {
 // Get all Project Details
 export async function getProjectDetails(req, res) {
   try {
-    const projectDetails = await __find();
+    const projectDetails = await ProjectDetails.find();
     res.json(projectDetails);
   } catch (error) {
     console.error('Error:', error);
@@ -188,8 +181,8 @@ export async function getProjectDetails(req, res) {
 export async function updateProjectDetails(req, res) {
   try {
     const { id } = req.params;
-    const projectDetails = await __findByIdAndUpdate(id, req.body, { new: true });
-    res.json(projectDetails);
+    const updatedProjectDetails = await ProjectDetails.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updatedProjectDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
@@ -199,34 +192,7 @@ export async function updateProjectDetails(req, res) {
 // Add Work Experience
 export async function addWorkExperience(req, res) {
   try {
-    const { currentWorking,
-      type,
-      companyName,
-      jobTitle,
-      annualSalary ,
-      joiningDate ,
-      leavingDate ,
-      noticePeriod ,
-      years,
-      months,
-      location,
-      department,
-      employmentType,
-      stipend} = req.body.workExperience
-    const workExperience = new WorkExperience({ currentWorking,
-      type,
-      companyName,
-      jobTitle,
-      annualSalary ,
-      joiningDate ,
-      leavingDate ,
-      noticePeriod ,
-      years,
-      months,
-      location,
-      department,
-      employmentType,
-      stipend});
+    const workExperience = new WorkExperience(req.body.workExperience);
     await workExperience.save();
     res.status(201).json(workExperience);
   } catch (error) {
@@ -238,7 +204,7 @@ export async function addWorkExperience(req, res) {
 // Get all Work Experiences
 export async function getWorkExperience(req, res) {
   try {
-    const workExperiences = await ___find();
+    const workExperiences = await WorkExperience.find();
     res.json(workExperiences);
   } catch (error) {
     console.error('Error:', error);
@@ -250,8 +216,8 @@ export async function getWorkExperience(req, res) {
 export async function updateWorkExperience(req, res) {
   try {
     const { id } = req.params;
-    const workExperience = await ___findByIdAndUpdate(id, req.body, { new: true });
-    res.json(workExperience);
+    const updatedWorkExperience = await WorkExperience.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updatedWorkExperience);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
@@ -273,7 +239,7 @@ export async function addDescription(req, res) {
 // Get all Descriptions
 export async function getDescription(req, res) {
   try {
-    const descriptions = await ____find();
+    const descriptions = await Description.find();
     res.json(descriptions);
   } catch (error) {
     console.error('Error:', error);
@@ -285,19 +251,19 @@ export async function getDescription(req, res) {
 export async function updateDescription(req, res) {
   try {
     const { id } = req.params;
-    const description = await ____findByIdAndUpdate(id, req.body, { new: true });
-    res.json(description);
+    const updatedDescription = await Description.findByIdAndUpdate(id, req.body, { new: true });
+    res.json(updatedDescription);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
 }
 
-
+// Delete Skill
 export async function deleteSkill(req, res) {
   try {
     const { id } = req.params;
-    await findByIdAndDelete(id);
+    await Skill.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
@@ -321,7 +287,7 @@ export async function deleteEducation(req, res) {
 export async function deletePersonalDetails(req, res) {
   try {
     const { id } = req.params;
-    await _findByIdAndDelete(id);
+    await PersonalDetails.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
@@ -333,7 +299,7 @@ export async function deletePersonalDetails(req, res) {
 export async function deleteProjectDetails(req, res) {
   try {
     const { id } = req.params;
-    await __findByIdAndDelete(id);
+    await ProjectDetails.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
@@ -345,7 +311,7 @@ export async function deleteProjectDetails(req, res) {
 export async function deleteWorkExperience(req, res) {
   try {
     const { id } = req.params;
-    await ___findByIdAndDelete(id);
+    await WorkExperience.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
@@ -357,7 +323,7 @@ export async function deleteWorkExperience(req, res) {
 export async function deleteDescription(req, res) {
   try {
     const { id } = req.params;
-    await ____findByIdAndDelete(id);
+    await Description.findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);

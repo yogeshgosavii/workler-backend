@@ -2,19 +2,22 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes';
-import profileRoutes from './routes/profileRoutes'
+import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
+// import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
+import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-app.use(cors({
-    origin: 'http://localhost:5173',
+const corsOptions = {
+    origin: '*',
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     credentials: true,
-}));
+};
+
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -46,9 +49,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+
+// Uncomment if needed
+// app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes);
-
-
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
