@@ -18,14 +18,14 @@ const config = require('../config'); // Ensure config is properly defined
 // };
 
 exports.signup = async (req, res) => {
-    const { email, password, username, birthDate, accountType } = req.body;
+    // const { email, password, username, birthDate, accountType } = req.body;
 
     console.log('Received signup request with data:');
-    console.log('Email:', email);
-    console.log('Password:', password);
-    console.log('Username:', username);
-    console.log('Birth Date:', birthDate);
-    console.log('Account Type:', accountType);
+    // console.log('Email:', email);
+    // console.log('Password:', password);
+    // console.log('Username:', username);
+    // console.log('Birth Date:', birthDate);
+    // console.log('Account Type:', accountType);
 
     res.status(200).send('Signup request received');
 };
