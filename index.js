@@ -1,10 +1,10 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
-const cors = require('cors');
-const authRoutes = require('./routes/authRoutes').default; // Uncomment authRoutes
-// const jobRoutes = require('./routes/jobRoutes');
-// const profileRoutes = require('./routes/profileRoutes');
+import express from 'express';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import authRoutes from './routes/authRoutes'; // Ensure authRoutes is properly exported
+// import jobRoutes from './routes/jobRoutes';
+// import profileRoutes from './routes/profileRoutes';
 
 dotenv.config();
 
