@@ -1,8 +1,8 @@
 // personalDetailsModel.js
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const personalDetailsSchema = new mongoose.Schema({
+const personalDetailsSchema = new Schema({
   fullname: String,
   phone:Number,
   address:String,
@@ -10,6 +10,6 @@ const personalDetailsSchema = new mongoose.Schema({
   // Add other fields as needed
 });
 
-const PersonalDetails = mongoose.model('PersonalDetails', personalDetailsSchema);
+const PersonalDetails = model('PersonalDetails', personalDetailsSchema);
 
-module.exports = PersonalDetails;
+export default PersonalDetails;

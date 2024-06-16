@@ -1,7 +1,7 @@
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const projectSchema = new mongoose.Schema({
+const projectSchema = new Schema({
   project_name: String,
   project_description: String,
   start_date:Date,
@@ -9,6 +9,6 @@ const projectSchema = new mongoose.Schema({
   url : String
  });
 
-const Project = mongoose.model('Project', projectSchema);
+const Project = model('Project', projectSchema);
 
-module.exports = Project;
+export default Project;

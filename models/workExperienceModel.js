@@ -1,7 +1,7 @@
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const workExperienceSchema = new mongoose.Schema({
+const workExperienceSchema = new Schema({
   currentWorking:String,
   type:String,
   companyName:String,
@@ -20,6 +20,6 @@ const workExperienceSchema = new mongoose.Schema({
 
 });
 
-const WorkExperience = mongoose.model('WorkExperience', workExperienceSchema);
+const WorkExperience = model('WorkExperience', workExperienceSchema);
 
-module.exports = WorkExperience;
+export default WorkExperience;

@@ -1,12 +1,12 @@
 // skillModel.js
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const skillSchema = new mongoose.Schema({
+const skillSchema = new Schema({
   name: String,
   level: String,
 });
 
-const Skill = mongoose.model('Skill', skillSchema);
+const Skill = model('Skill', skillSchema);
 
-module.exports = Skill;
+export default Skill;

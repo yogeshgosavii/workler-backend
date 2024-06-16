@@ -1,10 +1,10 @@
 
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const descriptionSchema = new mongoose.Schema({
+const descriptionSchema = new Schema({
   description:String
  });
 
-const Description = mongoose.model('Description', descriptionSchema);
+const Description = model('Description', descriptionSchema);
 
-module.exports = Description;
+export default Description;
