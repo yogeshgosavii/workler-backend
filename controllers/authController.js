@@ -1,6 +1,6 @@
 import { verify } from 'jsonwebtoken';
 import { findById } from '../models/userModel';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import { jwtSecret } from '../config'; // Ensure config is properly defined
 
 // exports.signup = async (req, res) => {
