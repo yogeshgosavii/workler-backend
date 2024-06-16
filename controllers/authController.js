@@ -2,6 +2,7 @@ import { verify } from 'jsonwebtoken';
 import { findById } from '../models/userModel';
 // import bcrypt from 'bcrypt';
 import { jwtSecret } from '../config'; // Ensure config is properly defined
+const User = require('../models/userModel');
 
 // exports.signup = async (req, res) => {
 //     const { email, password, username, birthDate, accountType } = req.body;
@@ -52,14 +53,14 @@ export async function getUserDetails(req, res) {
     try {
         const token = req.headers.authorization.split(' ')[1];
         console.log(token);
-        // const decoded = verify(token, jwtSecret);
-        // const user = await findById(decoded.userId).select('-password');
-        // if (!user) {
-        //     console.log(`User not found for details: ${decoded.userId}`);
-        //     return res.status(404).send('User not found');
-        // }
-        // console.log(`User details fetched: ${user.email}`);
-        // res.json(user);
+        const decoded = verify(token, jwtSecret);
+        const user = await findById(decoded.userId).select('-password');
+        if (!user) {
+            console.log(`User not found for details: ${decoded.userId}`);
+            return res.status(404).send('User not found');
+        }
+        console.log(`User details fetched: ${user.email}`);
+        res.json(user);
     } catch (error) {
         console.error('Fetch user details error:', error.message);
         res.status(500).send('Error fetching user details');
