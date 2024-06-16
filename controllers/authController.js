@@ -1,7 +1,7 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
-const bcrypt = require('bcrypt');
-const config = require('../config'); // Ensure config is properly defined
+// const jwt = require('jsonwebtoken');
+// const User = require('../models/userModel');
+// const bcrypt = require('bcrypt');
+// const config = require('../config'); // Ensure config is properly defined
 
 // exports.signup = async (req, res) => {
 //     const { email, password, username, birthDate, accountType } = req.body;
@@ -27,7 +27,7 @@ exports.signup = async (req, res) => {
     // console.log('Birth Date:', birthDate);
     // console.log('Account Type:', accountType);
 
-    res.status(200).send('Signup request received');
+    // res.status(200).send('Signup request received');
 };
 
 // exports.login = async (req, res) => {
