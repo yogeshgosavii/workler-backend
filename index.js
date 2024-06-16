@@ -12,13 +12,10 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-    // Replace with your domain
-    origin: 'https://workler-backend.vercel.app/',
+    origin: '*', // Allow any origin
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
-    // Enable this if you need to
-    // send cookies or HTTP authentication
     credentials: true,
-  };
+};
 
 app.use(cors(corsOptions)); // Use the cors middleware
 
