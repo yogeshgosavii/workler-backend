@@ -3,18 +3,31 @@ const User = require('../models/userModel');
 const bcrypt = require('bcrypt');
 const config = require('../config'); // Ensure config is properly defined
 
+// exports.signup = async (req, res) => {
+//     const { email, password, username, birthDate, accountType } = req.body;
+//     try {
+//         const hashedPassword = await bcrypt.hash(password, 10);
+//         const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
+//         await user.save();
+//         console.log(`User created: ${user.email}`);
+//         res.status(201).send('User created successfully');
+//     } catch (error) {
+//         console.error('Error creating user:', error);
+//         res.status(400).send('Error creating user');
+//     }
+// };
+
 exports.signup = async (req, res) => {
     const { email, password, username, birthDate, accountType } = req.body;
-    try {
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
-        await user.save();
-        console.log(`User created: ${user.email}`);
-        res.status(201).send('User created successfully');
-    } catch (error) {
-        console.error('Error creating user:', error);
-        res.status(400).send('Error creating user');
-    }
+
+    console.log('Received signup request with data:');
+    console.log('Email:', email);
+    console.log('Password:', password);
+    console.log('Username:', username);
+    console.log('Birth Date:', birthDate);
+    console.log('Account Type:', accountType);
+
+    res.status(200).send('Signup request received');
 };
 
 // exports.login = async (req, res) => {
