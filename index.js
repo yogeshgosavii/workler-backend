@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const authRoutes = require('./routes/authRoutes'); // Uncomment authRoutes
+const authRoutes = require('./routes/authRoutes').default; // Uncomment authRoutes
 // const jobRoutes = require('./routes/jobRoutes');
 // const profileRoutes = require('./routes/profileRoutes');
 
