@@ -1,15 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const {
-  addSkill, getSkill, updateSkill, deleteSkill,
-  addEducation, getEducation, updateEducation, deleteEducation,
-  addPersonalDetails, getPersonalDetails, updatePersonalDetails, deletePersonalDetails,
-  addProjectDetails, getProjectDetails, updateProjectDetails, deleteProjectDetails,
-  addWorkExperience, getWorkExperience, updateWorkExperience, deleteWorkExperience,
-  addDescription, getDescription, updateDescription, deleteDescription,
-} = require('../controllers/profileController');
+import { Router } from 'express';
+const router = Router();
+import { addSkill, getSkill, updateSkill, deleteSkill, addEducation, getEducation, updateEducation, deleteEducation, addPersonalDetails, getPersonalDetails, updatePersonalDetails, deletePersonalDetails, addProjectDetails, getProjectDetails, updateProjectDetails, deleteProjectDetails, addWorkExperience, getWorkExperience, updateWorkExperience, deleteWorkExperience, addDescription, getDescription, updateDescription, deleteDescription } from '../controllers/profileController';
 
-// Skill routes
+// Skill routess
 router.post('/skills', addSkill);
 router.get('/skills', getSkill);
 router.put('/skills/:id', updateSkill);
@@ -45,4 +38,4 @@ router.get('/descriptions', getDescription);
 router.put('/descriptions/:id', updateDescription);
 router.delete('/descriptions/:id', deleteDescription);
 
-module.exports = router;
+export default router;

@@ -1,20 +1,20 @@
-const Skill = require('../models/skillModel');
-const Education = require('../models/educationModel').default;
-const PersonalDetails = require('../models/personalDetailsModel');
-const ProjectDetails = require('../models/projectModel');
-const WorkExperience = require('../models/workExperienceModel');
-const Description = require('../models/descriptionModel')
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { default: mongoose } = require('mongoose');
+import Skill, { find, findByIdAndUpdate, findByIdAndDelete } from '../models/skillModel';
+import Education from '../models/educationModel';
+import PersonalDetails, { find as _find, findByIdAndUpdate as _findByIdAndUpdate, findByIdAndDelete as _findByIdAndDelete } from '../models/personalDetailsModel';
+import ProjectDetails, { find as __find, findByIdAndUpdate as __findByIdAndUpdate, findByIdAndDelete as __findByIdAndDelete } from '../models/projectModel';
+import WorkExperience, { find as ___find, findByIdAndUpdate as ___findByIdAndUpdate, findByIdAndDelete as ___findByIdAndDelete } from '../models/workExperienceModel';
+import Description, { find as ____find, findByIdAndUpdate as ____findByIdAndUpdate, findByIdAndDelete as ____findByIdAndDelete } from '../models/descriptionModel';
+import bcrypt from 'bcrypt';
+import { sign } from 'jsonwebtoken';
+import { default as mongoose } from 'mongoose';
 
 // Function to generate JWT token
 const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  return sign({ userId }, process.env.JWT_SECRET, { expiresIn: '1h' });
 };
 
 // Add Skill
-exports.addSkill = async (req, res) => {
+export async function addSkill(req, res) {
   try {
     const {name,level} = req.body.skills;
     console.log(name,level);
@@ -26,33 +26,33 @@ exports.addSkill = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Skills
-exports.getSkill = async (req, res) => {
+export async function getSkill(req, res) {
   try {
-    const skills = await Skill.find();
+    const skills = await find();
     res.json(skills);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Skill
-exports.updateSkill = async (req, res) => {
+export async function updateSkill(req, res) {
   try {
     const { id } = req.params;
-    const skill = await Skill.findByIdAndUpdate(id, req.body, { new: true });
+    const skill = await findByIdAndUpdate(id, req.body, { new: true });
     res.json(skill);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Add Education
-exports.addEducation = async (req, res) => {
+export async function addEducation(req, res) {
   try {
     const {educationType, university, course, specialization, start_year, end_year, board, school_name, passing_out_year,grade, marks, maths, physics, chemistry } = req.body.education;
 
@@ -79,10 +79,10 @@ exports.addEducation = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Educations
-exports.getEducation = async (req, res) => {
+export async function getEducation(req, res) {
   try {
     const educations = await Education.find();
     console.log(educations);
@@ -91,10 +91,10 @@ exports.getEducation = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Education
-exports.updateEducation = async (req, res) => {
+export async function updateEducation(req, res) {
 
   try {
     // Validate ObjectId
@@ -124,10 +124,10 @@ exports.updateEducation = async (req, res) => {
 
     res.status(500).json({ message: 'Server Error' });
   }
-};
+}
 
 // Add Personal Details
-exports.addPersonalDetails = async (req, res) => {
+export async function addPersonalDetails(req, res) {
   try {
     const personalDetails = new PersonalDetails(req.body);
     await personalDetails.save();
@@ -136,33 +136,33 @@ exports.addPersonalDetails = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Personal Details
-exports.getPersonalDetails = async (req, res) => {
+export async function getPersonalDetails(req, res) {
   try {
-    const personalDetails = await PersonalDetails.find();
+    const personalDetails = await _find();
     res.json(personalDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Personal Details
-exports.updatePersonalDetails = async (req, res) => {
+export async function updatePersonalDetails(req, res) {
   try {
     const { id } = req.params;
-    const personalDetails = await PersonalDetails.findByIdAndUpdate(id, req.body, { new: true });
+    const personalDetails = await _findByIdAndUpdate(id, req.body, { new: true });
     res.json(personalDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Add Project Details
-exports.addProjectDetails = async (req, res) => {
+export async function addProjectDetails(req, res) {
   try {
     const projectDetails = new ProjectDetails(req.body);
     await projectDetails.save();
@@ -171,33 +171,33 @@ exports.addProjectDetails = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Project Details
-exports.getProjectDetails = async (req, res) => {
+export async function getProjectDetails(req, res) {
   try {
-    const projectDetails = await ProjectDetails.find();
+    const projectDetails = await __find();
     res.json(projectDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Project Details
-exports.updateProjectDetails = async (req, res) => {
+export async function updateProjectDetails(req, res) {
   try {
     const { id } = req.params;
-    const projectDetails = await ProjectDetails.findByIdAndUpdate(id, req.body, { new: true });
+    const projectDetails = await __findByIdAndUpdate(id, req.body, { new: true });
     res.json(projectDetails);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Add Work Experience
-exports.addWorkExperience = async (req, res) => {
+export async function addWorkExperience(req, res) {
   try {
     const { currentWorking,
       type,
@@ -233,33 +233,33 @@ exports.addWorkExperience = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Work Experiences
-exports.getWorkExperience = async (req, res) => {
+export async function getWorkExperience(req, res) {
   try {
-    const workExperiences = await WorkExperience.find();
+    const workExperiences = await ___find();
     res.json(workExperiences);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Work Experience
-exports.updateWorkExperience = async (req, res) => {
+export async function updateWorkExperience(req, res) {
   try {
     const { id } = req.params;
-    const workExperience = await WorkExperience.findByIdAndUpdate(id, req.body, { new: true });
+    const workExperience = await ___findByIdAndUpdate(id, req.body, { new: true });
     res.json(workExperience);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Add Description
-exports.addDescription = async (req, res) => {
+export async function addDescription(req, res) {
   try {
     const description = new Description(req.body);
     await description.save();
@@ -268,45 +268,45 @@ exports.addDescription = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Get all Descriptions
-exports.getDescription = async (req, res) => {
+export async function getDescription(req, res) {
   try {
-    const descriptions = await Description.find();
+    const descriptions = await ____find();
     res.json(descriptions);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Update Description
-exports.updateDescription = async (req, res) => {
+export async function updateDescription(req, res) {
   try {
     const { id } = req.params;
-    const description = await Description.findByIdAndUpdate(id, req.body, { new: true });
+    const description = await ____findByIdAndUpdate(id, req.body, { new: true });
     res.json(description);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 
-exports.deleteSkill = async (req, res) => {
+export async function deleteSkill(req, res) {
   try {
     const { id } = req.params;
-    await Skill.findByIdAndDelete(id);
+    await findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Delete Education
-exports.deleteEducation = async (req, res) => {
+export async function deleteEducation(req, res) {
   try {
     const { id } = req.params;
     await Education.findByIdAndDelete(id);
@@ -315,53 +315,53 @@ exports.deleteEducation = async (req, res) => {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Delete Personal Details
-exports.deletePersonalDetails = async (req, res) => {
+export async function deletePersonalDetails(req, res) {
   try {
     const { id } = req.params;
-    await PersonalDetails.findByIdAndDelete(id);
+    await _findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Delete Project Details
-exports.deleteProjectDetails = async (req, res) => {
+export async function deleteProjectDetails(req, res) {
   try {
     const { id } = req.params;
-    await ProjectDetails.findByIdAndDelete(id);
+    await __findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Delete Work Experience
-exports.deleteWorkExperience = async (req, res) => {
+export async function deleteWorkExperience(req, res) {
   try {
     const { id } = req.params;
-    await WorkExperience.findByIdAndDelete(id);
+    await ___findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
 // Delete Description
-exports.deleteDescription = async (req, res) => {
+export async function deleteDescription(req, res) {
   try {
     const { id } = req.params;
-    await Description.findByIdAndDelete(id);
+    await ____findByIdAndDelete(id);
     res.status(204).send();
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
-};
+}
 
