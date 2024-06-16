@@ -17,24 +17,24 @@ exports.signup = async (req, res) => {
     }
 };
 
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        const user = await User.findOne({ email });
-        if (!user) {
-            return res.status(404).send('User not found');
-        }
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            return res.status(400).send('Invalid password');
-        }
-        const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '1h' });
-        res.json({ token });
-    } catch (error) {
-        console.error('Login error:', error.message);
-        res.status(500).send('Server error');
-    }
-};
+// exports.login = async (req, res) => {
+//     const { email, password } = req.body;
+//     try {
+//         const user = await User.findOne({ email });
+//         if (!user) {
+//             return res.status(404).send('User not found');
+//         }
+//         const isPasswordValid = await bcrypt.compare(password, user.password);
+//         if (!isPasswordValid) {
+//             return res.status(400).send('Invalid password');
+//         }
+//         const token = jwt.sign({ userId: user._id }, config.jwtSecret, { expiresIn: '1h' });
+//         res.json({ token });
+//     } catch (error) {
+//         console.error('Login error:', error.message);
+//         res.status(500).send('Server error');
+//     }
+// };
 
 // exports.checkEmail = async (req, res) => {
 //     const { email } = req.body;
