@@ -54,7 +54,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
-const jobRoutes = require('./routes/jobRoutes');
+// const jobRoutes = require('./routes/jobRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 
 dotenv.config();
@@ -94,7 +94,7 @@ app.get("/", (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/jobs', jobRoutes);
+// app.use('/api/jobs', jobRoutes);
 app.use('/api/profile', profileRoutes);
 
 app.listen(PORT, () => {
