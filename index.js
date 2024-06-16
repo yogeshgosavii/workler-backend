@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-// const authRoutes = require('./routes/authRoutes');
+const authRoutes = require('./routes/authRoutes'); // Uncomment authRoutes
 // const jobRoutes = require('./routes/jobRoutes');
 // const profileRoutes = require('./routes/profileRoutes');
 
@@ -50,10 +50,11 @@ app.get("/", (req, res) => {
     res.send("prod running with MongoDB connection");
 });
 
-// app.use('/api/auth', authRoutes);
+// Enable authRoutes
+app.use('/api/auth', authRoutes);
+
 // app.use('/api/jobs', jobRoutes);
 // app.use('/api/profile', profileRoutes);
-
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
