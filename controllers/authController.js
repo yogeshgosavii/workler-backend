@@ -1,8 +1,7 @@
 import { verify } from 'jsonwebtoken';
 import { findById } from '../models/userModel';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 import { jwtSecret } from '../config'; // Ensure config is properly defined
-const User = require('../models/userModel');
 
 // exports.signup = async (req, res) => {
 //     const { email, password, username, birthDate, accountType } = req.body;
@@ -38,28 +37,20 @@ const User = require('../models/userModel');
 //     }
 // };
 
-export async function checkEmail(req, res) {
-    const { email } = req.body;
-    console.log(email);
-    // try {
-    //     const user = await User.findOne({ email });
-    //     if (user) {
-    //         // Email exists in database
-    //         res.json({ exists: true });
-    //     } else {
-    //         // Email does not exist in database
-    //         res.json({ exists: false });
-    //     }
-    // } catch (error) {
-    //     console.error('Error checking email:', error.message);
-    //     res.status(500).send('Error checking email');
-    // }
-}
+// exports.checkEmail = async (req, res) => {
+//     const { email } = req.body;
+//     try {
+//         const user = await User.findOne({ email });
+//         res.json({ exists: !!user });
+//     } catch (error) {
+//         console.error('Error checking email:', error.message);
+//         res.status(500).send('Error checking email');
+//     }
+// };
 
 export async function getUserDetails(req, res) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        console.log(token);
         const decoded = verify(token, jwtSecret);
         const user = await findById(decoded.userId).select('-password');
         if (!user) {
