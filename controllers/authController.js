@@ -1,6 +1,6 @@
 import { verify } from 'jsonwebtoken';
 import { findById } from '../models/userModel';
-// import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import { jwtSecret } from '../config'; // Ensure config is properly defined
 const User = require('../models/userModel');
 
@@ -38,16 +38,16 @@ const User = require('../models/userModel');
 //     }
 // };
 
-// exports.checkEmail = async (req, res) => {
-//     const { email } = req.body;
-//     try {
-//         const user = await User.findOne({ email });
-//         res.json({ exists: !!user });
-//     } catch (error) {
-//         console.error('Error checking email:', error.message);
-//         res.status(500).send('Error checking email');
-//     }
-// };
+exports.checkEmail = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        res.json({ exists: !!user });
+    } catch (error) {
+        console.error('Error checking email:', error.message);
+        res.status(500).send('Error checking email');
+    }
+};
 
 export async function getUserDetails(req, res) {
     try {
