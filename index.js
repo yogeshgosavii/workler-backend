@@ -9,13 +9,11 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-const corsOptions = {
-    origin: '*',
+app.use(cors({
+    origin: 'http://localhost:5173',
     methods: 'GET, HEAD, PUT, PATCH, POST, DELETE',
     credentials: true,
-};
-
-app.use(cors(corsOptions));
+}));
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
