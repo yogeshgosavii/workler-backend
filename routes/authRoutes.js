@@ -1,6 +1,6 @@
 import { Router } from 'express';
 const router = Router();
-import {  getUserDetails } from '../controllers/authController';
+import { checkEmail, getUserDetails } from '../controllers/authController';
 import { protect } from '../middleware/authMiddleware';
 
 // router.post('/signup', authController.signup);
