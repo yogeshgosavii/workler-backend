@@ -1,6 +1,6 @@
-const mongoose = require('mongoose');
+import { Schema, model } from 'mongoose';
 
-const educationSchema = new mongoose.Schema({
+const educationSchema = new Schema({
   educationType:String,
   university: String,
   course: String,
@@ -16,6 +16,6 @@ const educationSchema = new mongoose.Schema({
   chemistry: Number,
 });
 
-const Education = mongoose.model('Education', educationSchema);
+const Education = model('Education', educationSchema);
 
-module.exports = Education;
+export default Education;

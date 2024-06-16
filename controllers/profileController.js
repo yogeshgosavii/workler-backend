@@ -1,5 +1,5 @@
 const Skill = require('../models/skillModel');
-const Education = require('../models/educationModel');
+const Education = require('../models/educationModel').default;
 const PersonalDetails = require('../models/personalDetailsModel');
 const ProjectDetails = require('../models/projectModel');
 const WorkExperience = require('../models/workExperienceModel');
