@@ -38,9 +38,9 @@ app.get("/", (req, res) => {
 
 // Import and use routes
 import authRoutes from './routes/authRoutes.js';
-// import profileRoutes from './routes/profileRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
 
 app.use('/api/auth', authRoutes);
-// app.use('/api/profile', profileRoutes);
+app.use('/api/profile', profileRoutes);
 
 export default app;
