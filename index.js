@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
 // import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
-import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
+// import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
 dotenv.config();
 
