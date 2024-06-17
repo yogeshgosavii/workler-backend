@@ -1,7 +1,12 @@
 import { Schema, model } from 'mongoose';
 
 const educationSchema = new Schema({
-  educationType:String,
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },
+    educationType:String,
   university: String,
   course: String,
   specialization: String,

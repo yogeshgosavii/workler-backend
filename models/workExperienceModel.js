@@ -2,6 +2,11 @@
 import { Schema, model } from 'mongoose';
 
 const workExperienceSchema = new Schema({
+  user: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User'
+  },  
   currentWorking:String,
   type:String,
   companyName:String,
