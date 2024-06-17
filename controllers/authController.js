@@ -59,35 +59,35 @@ export async function checkEmail(req, res) {
 }
 
 // Function to fetch user details using JWT token
-// export async function getUserDetails(req, res) {
-//     try {
-//         // Extract token from authorization header
-//         const token = req.headers.authorization.split(' ')[1];
+export async function getUserDetails(req, res) {
+    try {
+        // Extract token from authorization header
+        const token = req.headers.authorization.split(' ')[1];
         
-//         // Verify and decode the token
-//         const decoded = jwt.verify(token, jwtSecret);
+        // Verify and decode the token
+        const decoded = jwt.verify(token, jwtSecret);
         
-//         // Find user by decoded user ID from token, exclude password field
-//         const user = await User.findById(decoded.userId).select('-password');
+        // Find user by decoded user ID from token, exclude password field
+        const user = await User.findById(decoded.userId).select('-password');
         
-//         if (!user) {
-//             console.log(`User not found for details: ${decoded.userId}`);
-//             return res.status(404).send('User not found');
-//         }
+        if (!user) {
+            console.log(`User not found for details: ${decoded.userId}`);
+            return res.status(404).send('User not found');
+        }
         
-//         console.log(`User details fetched: ${user.email}`);
-//         res.json(user);
-//     } catch (error) {
-//         console.error('Fetch user details error:', error.message);
+        console.log(`User details fetched: ${user.email}`);
+        res.json(user);
+    } catch (error) {
+        console.error('Fetch user details error:', error.message);
         
-//         if (error instanceof jwt.TokenExpiredError) {
-//             return res.status(401).send('Token expired');
-//         }
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).send('Token expired');
+        }
         
-//         if (error.name === 'JsonWebTokenError') {
-//             return res.status(401).send('Invalid token');
-//         }
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).send('Invalid token');
+        }
         
-//         res.status(500).send('Error fetching user details');
-//     }
-// }
+        res.status(500).send('Error fetching user details');
+    }
+}
