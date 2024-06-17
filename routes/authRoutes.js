@@ -8,6 +8,6 @@ import { checkEmail,} from '../controllers/authController.js';
 router.post('/check-email', checkEmail);
 
 // Example of protecting a route with authentication middleware
-router.get('/user', getUserDetails);
+// router.get('/user', getUserDetails);
 
 export default router;
