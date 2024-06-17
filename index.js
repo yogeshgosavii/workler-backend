@@ -52,4 +52,4 @@ app.use('/api/auth', authRoutes);
 
 // Uncomment if needed
 // app.use('/api/jobs', jobRoutes);
-app.use('/api/profile', profileRoutes);
+// app.use('/api/profile', profileRoutes);
