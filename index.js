@@ -1,9 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-// import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
-// import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
-// import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
 dotenv.config();
 
@@ -39,9 +36,11 @@ app.get("/", (req, res) => {
     res.send("prod running with MongoDB connection");
 });
 
-// Uncomment and configure routes as needed
-// app.use('/api/auth', authRoutes);
-// app.use('/api/jobs', jobRoutes);
-// app.use('/api/profile', profileRoutes);
+// Import and use routes
+import authRoutes from './routes/authRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+
+app.use('/api/auth', authRoutes);
+app.use('/api/profile', profileRoutes);
 
 export default app;
