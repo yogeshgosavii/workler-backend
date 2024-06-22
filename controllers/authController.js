@@ -17,7 +17,7 @@ export async function signup(req, res) {
         res.status(201).send('User created successfully');
     } catch (error) {
         console.error('Error creating user:', error.message, error.stack);
-        res.status(400).send('Error creating user');
+        res.status(500).send('Error creating user');
     }
 }
 
