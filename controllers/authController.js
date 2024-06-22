@@ -16,7 +16,7 @@ export async function signup(req, res) {
         console.log(`User created: ${user.email}`);
         res.status(201).send('User created successfully');
     } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error creating user:', error.message, error.stack);
         res.status(400).send('Error creating user');
     }
 }
@@ -40,7 +40,7 @@ export async function login(req, res) {
         const token = sign({ userId: user._id }, jwtSecret, { expiresIn: '1h' });
         res.json({ token });
     } catch (error) {
-        console.error('Login error:', error.message);
+        console.error('Login error:', error.message, error.stack);
         res.status(500).send('Server error');
     }
 }
@@ -53,7 +53,7 @@ export async function checkEmail(req, res) {
         const user = await User.findOne({ email });
         res.json({ exists: !!user });
     } catch (error) {
-        console.error('Error checking email:', error.message);
+        console.error('Error checking email:', error.message, error.stack);
         res.status(500).send('Error checking email');
     }
 }
@@ -78,7 +78,7 @@ export async function getUserDetails(req, res) {
         console.log(`User details fetched: ${user.email}`);
         res.json(user);
     } catch (error) {
-        console.error('Fetch user details error:', error.message);
+        console.error('Fetch user details error:', error.message, error.stack);
         
         if (error instanceof jwt.TokenExpiredError) {
             return res.status(401).send('Token expired');
