@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
+// import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
 // import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
 // import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
@@ -48,7 +48,7 @@ app.get("/", (req, res) => {
     res.send("prod running with MongoDB connection");
 });
 
-app.use('/api/auth', authRoutes);
+// app.use('/api/auth', authRoutes);
 
 // Uncomment if needed
 // app.use('/api/jobs', jobRoutes);
