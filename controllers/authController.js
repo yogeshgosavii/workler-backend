@@ -1,9 +1,9 @@
-// import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 // import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
-// import { jwtSecret } from '../config.js';
+import { jwtSecret } from '../config.js';
 
-// const { sign, verify } = jwt;
+const { sign, verify } = jwt;
 
 // // Function to handle user signup
 // export async function signup(req, res) {
