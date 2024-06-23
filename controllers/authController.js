@@ -91,3 +91,28 @@
 //         res.status(500).send('Error fetching user details');
 //     }
 // }
+
+// controllers/authController.js
+
+import bcrypt from 'bcrypt';
+import User from '../models/userModel.js'; // Ensure the path is correct
+
+export const signup = async (req, res) => {
+    const { email, password, username, birthDate, accountType } = req.body;
+    try {
+        // Hash the password before saving it
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
+        await user.save();
+        console.log(`User created: ${user.email}`);
+        res.status(201).send('User created successfully');
+    } catch (error) {
+        console.error('Error creating user:', error);
+        res.status(400).send('Error creating user');
+    }
+};
+
+export const testAuth = (req, res) => {
+    res.send('Auth controller test is working');
+};
+

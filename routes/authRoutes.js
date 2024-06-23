@@ -1,9 +1,11 @@
+// routes/authRoutes.js
+
 import { Router } from 'express';
+import { testAuth } from '../controllers/authController.js'; 
+
 const router = Router();
 
-// Simple test route to verify the router is working
-router.get('/test', (req, res) => {
-    res.send('Test route is working');
-});
+// Simple test route to verify the controller is working
+router.get('/testAuth', testAuth);
 
 export default router;
