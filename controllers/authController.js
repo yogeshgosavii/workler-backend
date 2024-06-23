@@ -1,9 +1,9 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import User from '../models/userModel.js';
-import { jwtSecret } from '../config.js';
+// import jwt from 'jsonwebtoken';
+// import bcrypt from 'bcrypt';
+// import User from '../models/userModel.js';
+// import { jwtSecret } from '../config.js';
 
-const { sign, verify } = jwt;
+// const { sign, verify } = jwt;
 
 // // Function to handle user signup
 // export async function signup(req, res) {
@@ -46,17 +46,17 @@ const { sign, verify } = jwt;
 // }
 
 // Function to check if an email exists in the database
-export  function checkEmail(req, res) {
-    // const { email } = req.body;
-    // try {
-    //     // Check if there is a user with the provided email
-    //     const user = await User.findOne({ email });
-    //     res.json({ exists: !!user });
-    // } catch (error) {
-    //     console.error('Error checking email:', error.message, error.stack);
-    //     res.status(500).send('Error checking email');
-    // }
-}
+// export  function checkEmail(req, res) {
+//     // const { email } = req.body;
+//     // try {
+//     //     // Check if there is a user with the provided email
+//     //     const user = await User.findOne({ email });
+//     //     res.json({ exists: !!user });
+//     // } catch (error) {
+//     //     console.error('Error checking email:', error.message, error.stack);
+//     //     res.status(500).send('Error checking email');
+//     // }
+// }
 
 // // Function to fetch user details using JWT token
 // export async function getUserDetails(req, res) {
