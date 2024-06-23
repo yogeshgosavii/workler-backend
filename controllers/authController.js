@@ -46,16 +46,16 @@ const { sign, verify } = jwt;
 // }
 
 // Function to check if an email exists in the database
-export async function checkEmail(req, res) {
-    const { email } = req.body;
-    try {
-        // Check if there is a user with the provided email
-        const user = await User.findOne({ email });
-        res.json({ exists: !!user });
-    } catch (error) {
-        console.error('Error checking email:', error.message, error.stack);
-        res.status(500).send('Error checking email');
-    }
+export  function checkEmail(req, res) {
+    // const { email } = req.body;
+    // try {
+    //     // Check if there is a user with the provided email
+    //     const user = await User.findOne({ email });
+    //     res.json({ exists: !!user });
+    // } catch (error) {
+    //     console.error('Error checking email:', error.message, error.stack);
+    //     res.status(500).send('Error checking email');
+    // }
 }
 
 // // Function to fetch user details using JWT token
