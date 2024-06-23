@@ -2,9 +2,6 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-// import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
-// import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
-// import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
 dotenv.config();
 
@@ -39,7 +36,7 @@ mongoose.connect(MONGO_URI, {
         console.log(`Server is running on port ${PORT}`);
     });
 }).catch((err) => {
-    console.error('Failed to connect to MongoDB:', err.message);
+    console.error('Failed to connect to MongoDB:', err.message, err.stack);
     process.exit(1);
 });
 
@@ -48,8 +45,9 @@ app.get("/", (req, res) => {
     res.send("prod running with MongoDB connection");
 });
 
+// Ensure routes are properly defined before using
 // app.use('/api/auth', authRoutes);
-
-// Uncomment if needed
 // app.use('/api/jobs', jobRoutes);
 // app.use('/api/profile', profileRoutes);
+
+export default app;
