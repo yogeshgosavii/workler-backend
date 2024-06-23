@@ -94,6 +94,8 @@
 
 // controllers/authController.js
 
+// controllers/authController.js
+
 import bcrypt from 'bcrypt';
 import User from '../models/userModel.js'; // Ensure the path is correct
 
@@ -115,4 +117,5 @@ export const signup = async (req, res) => {
 export const testAuth = (req, res) => {
     res.send('Auth controller test is working');
 };
+
 
