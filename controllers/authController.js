@@ -1,5 +1,5 @@
 // Example of improved error handling in authController.js
-import bcrypt from 'bcrypt';
+import User from '../models/userModel.js';
 
 
 
