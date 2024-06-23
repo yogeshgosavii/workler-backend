@@ -22,7 +22,7 @@ app.use(cors(corsOptions));
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-console.log("MONGO_URI:", MONGO_URI);
+console.log("MONGO_URI::", MONGO_URI);
 
 if (!MONGO_URI) {
     console.error('Error: MONGO_URI is not defined in environment variables');
