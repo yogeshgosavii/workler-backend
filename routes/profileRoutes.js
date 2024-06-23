@@ -14,7 +14,7 @@ const router = express.Router();
 // Routes for Skills
 router.route('/skills')
   .post(protect, addSkill)
-  .get(protect, getSkills);
+  .get( getSkills);
 
 router.route('/skills/:id')
   .put(protect, updateSkill)
@@ -23,7 +23,7 @@ router.route('/skills/:id')
 // Routes for Education
 router.route('/education')
   .post(protect, addEducation)
-  .get(protect, getEducation);
+  .get( getEducation);
 
 router.route('/education/:id')
   .put(protect, updateEducation)
