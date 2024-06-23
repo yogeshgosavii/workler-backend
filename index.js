@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-// import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
+import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
 // import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
 // import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
 
@@ -49,7 +49,7 @@ app.get("/", (req, res) => {
 });
 
 // Ensure routes are properly defined before using
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // app.use('/api/jobs', jobRoutes);
 // app.use('/api/profile', profileRoutes);
 
