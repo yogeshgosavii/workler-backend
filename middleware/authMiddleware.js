@@ -6,6 +6,8 @@ export async function protect(req, res, next) {
   try {
     let token;
 
+
+    // Extract token from header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
       token = req.headers.authorization.split(' ')[1];
     }
@@ -14,19 +16,28 @@ export async function protect(req, res, next) {
       return res.status(401).json({ message: 'Not authorized, no token' });
     }
 
-    const decoded = jwt.verify(token, jwtSecret); // Use jwt.verify directly
-    // console.log(decoded);
+    // Verify token
+    let decoded;
+    try {
+      decoded = jwt.verify(token, jwtSecret);
+      console.log('Decoded token:', decoded);
+    } catch (error) {
+      console.error('JWT verification error:', error.message);
+      return res.status(401).json({ message: 'Not authorized, token invalid' });
+    }
 
+    // Check if token is decoded
     if (!decoded) {
       return res.status(401).json({ message: 'Not authorized, token invalid' });
     }
 
+    // Find user by ID
     const user = await User.findById(decoded.userId).select('-password');
-
     if (!user) {
       return res.status(401).json({ message: 'Not authorized, user not found' });
     }
 
+    // Attach user to request
     req.user = user;
     next();
   } catch (error) {

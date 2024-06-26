@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-// import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 import User from '../models/userModel.js';
 import { jwtSecret } from '../config.js';
 
@@ -41,7 +41,7 @@ export async function login(req, res) {
         }
         
         // Generate JWT token with user ID as payload
-        const token = sign({ userId: user._id }, jwtSecret, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, jwtSecret, { expiresIn: '7d' });
         res.json({ token });
     } catch (error) {
         console.error('Login error:', error.message, error.stack);
