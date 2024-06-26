@@ -10,7 +10,7 @@ import { testAuth } from '../controllers/authController.js';
 
 // Example of protecting a route with authentication middleware
 // router.get('/user', getUserDetails);
-router.get('/testAuth', testAuth);
+router.get('/testauth', testAuth);
 
 
 export default router;
