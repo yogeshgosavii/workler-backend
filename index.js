@@ -12,7 +12,7 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-    origin: 'https://workler-frontend.vercel.app', // Allow your frontend's origin
+    origin: '*', // Allow your frontend's origin
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: ['Content-Type', 'Authorization'] // Include Authorization in allowed headers
   };
