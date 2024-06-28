@@ -49,8 +49,8 @@ app.get("/", (req, res) => {
 });
 
 // Ensure routes are properly defined before using
-app.use('/api/auth/', authRoutes);
+app.options('/api/auth/', authRoutes);
 // app.use('/api/jobs', jobRoutes);
-app.use('/api/profile/', profileRoutes);
+app.options('/api/profile/', profileRoutes);
 
 export default app;
