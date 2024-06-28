@@ -49,8 +49,17 @@ app.get("/", (req, res) => {
 });
 
 // Ensure routes are properly defined before using
-app.options('/api/auth/', authRoutes);
+app.options('/api/auth/', (req, res) => {
+    res.status(200).send(); // Respond with an HTTP OK (200) for preflight requests
+  });
+  
+app.use('/api/auth/', authRoutes);
 // app.use('/api/jobs', jobRoutes);
-app.options('/api/profile/', profileRoutes);
+
+app.options('/api/profile/', (req, res) => {
+    res.status(200).send(); // Respond with an HTTP OK (200) for preflight requests
+  });
+  
+  app.use('/api/profile/', profileRoutes);
 
 export default app;
