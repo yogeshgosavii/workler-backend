@@ -59,7 +59,7 @@ app.use('/api/auth/', authRoutes);
 app.options('/api/profile/', (req, res) => {
     res.status(200).send(); // Respond with an HTTP OK (200) for preflight requests
   });
-  
-  app.use('/api/profile/', profileRoutes);
+
+app.use('/api/profile/', profileRoutes);
 
 export default app;
