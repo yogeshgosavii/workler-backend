@@ -7,21 +7,14 @@
 			"use": "@vercel/node"
 		}
 	],
-	"rewrites": [
+	"routes": [
 		{
 			"source": "/(.*)",
-			"destination": "./index.js"
+			"destination": "./index.js",
+			"methods" :  ["GET","POST","PUT","DELETE","OPTIONS"],
+			"headers": {
+			 "Access-Control-Allow-Origin": "*"   
+			}
 		}
-	],
-	"headers": [
-		{
-			"source": "/api/profile/education/",  
-			"headers": [
-			{ "key": "Access-Control-Allow-Origin", "value": "*" },  
-			{ "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
-			{ "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }, 
-			{ "key": "Access-Control-Allow-Credentials", "value": "true" } 
-			]
-		}
-]
+	]
 }
