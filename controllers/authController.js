@@ -66,17 +66,17 @@ export async function checkEmail(req, res) {
 export async function getUserDetails(req, res) {
     try {
         // Extract token from authorization header
-        // const token = req.headers.authorization.split(' ')[1];
+        const token = req.headers.authorization.split(' ')[1];
         
-        // // Verify and decode the token
-        // const decoded = jwt.verify(token, jwtSecret);
-        // console.log(decoded);
+        // Verify and decode the token
+        const decoded = jwt.verify(token, jwtSecret);
+        console.log(decoded);
         
         // Find user by decoded user ID from token, exclude password field
-        const user = await User.findById('666f97c6636adba437e4a8b4').select('-password');
+        const user = await User.findById(decoded.userId).select('-password');
         
         if (!user) {
-            console.log(`User not found for details: ${'666f97c6636adba437e4a8b4'}`);
+            console.log(`User not found for details: ${decoded.userId}`);
             return res.status(404).send('User not found');
         }
         
@@ -85,13 +85,13 @@ export async function getUserDetails(req, res) {
     } catch (error) {
         console.error('Fetch user details error:', error.message, error.stack);
         
-        // if (error instanceof jwt.TokenExpiredError) {
-        //     return res.status(401).send('Token expired');
-        // }
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).send('Token expired');
+        }
         
-        // if (error.name === 'JsonWebTokenError') {
-        //     return res.status(401).send('Invalid token');
-        // }
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).send('Invalid token');
+        }
         
         res.status(500).send('Error fetching user details');
     }
