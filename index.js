@@ -12,10 +12,10 @@ const app = express();
 app.use(express.json());
 
 const corsOptions = {
-    origin: '*', // Allow your frontend's origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: ['Content-Type', 'Authorization'] // Include Authorization in allowed headers
-  };
+    credentials: true,
+    origin: ['http://localhost:5173', 'https://workler.netlify.app/'] // Whitelist the domains you want to allow
+};
+
 
 app.use(cors(corsOptions));
 
