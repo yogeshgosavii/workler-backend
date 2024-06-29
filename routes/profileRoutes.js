@@ -23,7 +23,7 @@ router.route('/skills/:id')
 // Routes for Education
 router.route('/education')
   .post(protect, addEducation)
-  .get(getEducation);
+  .get(protect, getEducation);
 
 router.route('/education/:id')
   .put(protect, updateEducation)
