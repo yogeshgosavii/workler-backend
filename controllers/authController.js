@@ -70,6 +70,7 @@ export async function getUserDetails(req, res) {
         
         // Verify and decode the token
         const decoded = jwt.verify(token, jwtSecret);
+        console.log(decoded);
         
         // Find user by decoded user ID from token, exclude password field
         const user = await User.findById(decoded.userId).select('-password');
