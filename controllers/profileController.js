@@ -11,6 +11,7 @@ const handleCreate = (Model) => async (req, res) => {
   console.log(req)
   try {
     const data = new Model({ ...req.body, user: req.user._id });
+    console.log(data)
     await data.save();
     res.status(201).json(data);
   } catch (error) {
@@ -50,17 +51,17 @@ const handleUpdate = (Model) => async (req, res) => {
 const handleDelete = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await Model.findById(id);
+    const data = await Model.findByIdAndDelete(id);
 
-    if (!data || data.user.toString() !== req.user?._id.toString()) {
+    if (!data) {
       return res.status(401).json({ message: 'Not authorized' });
     }
 
-    await data.remove();
-    res.status(204).send();
+    // Return a success message as JSON
+    return res.status(200).json({ message: 'Deletion successful' });
   } catch (error) {
     console.error('Error:', error);
-    res.status(500).send('Server Error');
+    return res.status(500).json({ message: 'Server Error' });
   }
 };
 

@@ -7,7 +7,7 @@ const workExperienceSchema = new Schema({
     required: true,
     ref: 'User'
   },  
-  currentWorking:String,
+  currentlyWorking:String,
   type:String,
   companyName:String,
   jobTitle:String,
