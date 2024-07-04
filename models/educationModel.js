@@ -13,6 +13,7 @@ const educationSchema = new Schema({
   start_year: Number,
   end_year: Number,
   board: String,
+  grades: Number,
   school_name: String,
   passing_out_year: Number,
   marks: Number,

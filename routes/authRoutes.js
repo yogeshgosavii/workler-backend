@@ -9,7 +9,7 @@ router.post('/login', login);
 router.post('/check-email', checkEmail);
 
 // Example of protecting a route with authentication middleware
-router.route('/user').get( protect,getUserDetails);
+router.route('/user').get(getUserDetails);
 router.route('/testAuth').get(testAuth);
 
 
