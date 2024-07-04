@@ -20,6 +20,7 @@ const educationSchema = new Schema({
   maths: Number,
   physics: Number,
   chemistry: Number,
+  educationMode : String
 });
 
 const Education = model('Education', educationSchema);
