@@ -17,7 +17,7 @@ const educationSchema = new Schema({
   maximum_grades : Number,
   marking_system : String, 
   school_name: String,
-  passing_out_year: Number,
+  passing_out_month: Number,
   percentage: Number,
   maths: Number,
   physics: Number,
