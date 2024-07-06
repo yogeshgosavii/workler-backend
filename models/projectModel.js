@@ -11,6 +11,7 @@ const projectSchema = new Schema({
   project_description: String,
   start_date:Date,
   end_date:Date,
+  technologies : [String],
   url : String
  });
 
