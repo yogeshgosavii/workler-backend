@@ -63,6 +63,52 @@ export async function checkEmail(req, res) {
 }
 
 // Function to fetch user details using JWT token
+export async function updateUserDetails(req, res) {
+    try {
+        // Extract token from authorization header
+        const token = req.headers.authorization.split(' ')[1];
+        
+        // Verify and decode the token
+        const decoded = jwt.verify(token, jwtSecret);
+        
+        // Find user by decoded user ID from token, exclude password field
+        const user = await User.findById(decoded.userId).select('-password');
+        
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+        
+        // Update user details with the data from the request body
+        const { username, email, about, githubLink, linkedInLink, portfolioLink, tags, profileImage } = req.body;
+
+        if (username) user.username = username;
+        if (email) user.email = email;
+        if (about) user.about = about;
+        if (githubLink) user.githubLink = githubLink;
+        if (linkedInLink) user.linkedInLink = linkedInLink;
+        if (portfolioLink) user.portfolioLink = portfolioLink;
+        if (tags) user.tags = tags;
+        if (profileImage) user.profileImage = profileImage; // Handle profile image update
+
+        // Save the updated user back to the database
+        const updatedUser = await user.save();
+
+        res.json(updatedUser);
+    } catch (error) {
+        console.error('Update user details error:', error.message, error.stack);
+
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).send('Token expired');
+        }
+
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).send('Invalid token');
+        }
+
+        res.status(500).send('Error updating user details');
+    }
+}
+
 export async function getUserDetails(req, res) {
     try {
         // Extract token from authorization header

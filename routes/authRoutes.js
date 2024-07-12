@@ -1,6 +1,6 @@
 import { Router } from 'express';
 const router = Router();
-import { signup, login, checkEmail , getUserDetails, testAuth } from '../controllers/authController.js'; 
+import { signup, login, checkEmail ,updateUserDetails , getUserDetails, testAuth } from '../controllers/authController.js'; 
 
 import { protect } from '../middleware/authMiddleware.js';
 
@@ -10,7 +10,9 @@ router.post('/check-email', checkEmail);
 
 // Example of protecting a route with authentication middleware
 router.route('/user').get(getUserDetails);
-router.route('/testAuth').get(testAuth);
+router.route('/update-user').get(getUserDetails);
+
+router.put('/testAuth',updateUserDetails);
 
 
 export default router;
