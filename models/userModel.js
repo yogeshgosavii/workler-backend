@@ -10,7 +10,8 @@ const userSchema = new mongoose.Schema({
     portfolioLink: { type: String },
     about: { type: String },
     tags: { type: [String] },
-    profileImage: { type: String } // Base64 encoded string or URL
+    profileImage: { type: String }, 
+    profileImageCompressed : {type : String}
 });
 
 const User = mongoose.model('User', userSchema);
