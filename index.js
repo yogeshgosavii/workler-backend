@@ -5,6 +5,7 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
 // import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
 import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
+import fileRoutes from './routes/fileRoutes.js'; // Uncomment if needed
 
 dotenv.config();
 
@@ -61,5 +62,8 @@ app.options('/api/profile/', (req, res) => {
   });
 
 app.use('/api/profile/', profileRoutes);
+
+app.use('/api/files/', fileRoutes );
+
 
 export default app;
