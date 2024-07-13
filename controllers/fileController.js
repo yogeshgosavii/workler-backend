@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import Image from '../models/imageModel.js';
 import User from '../models/userModel.js';
 import { jwtSecret } from '../config.js';
-import upload from '../middlewares/uploadMiddleware.js';
+import upload from '../middleware/uploadMiddleware.js';
 
 export async function uploadImages(req, res) {
   try {
