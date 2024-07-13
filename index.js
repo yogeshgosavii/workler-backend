@@ -63,7 +63,7 @@ app.options('/api/profile/', (req, res) => {
 
 app.use('/api/profile/', profileRoutes);
 
-// app.use('/api/files/', fileRoutes );
+app.use('/api/files/', fileRoutes );
 
 
 export default app;
