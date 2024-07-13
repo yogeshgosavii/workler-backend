@@ -58,7 +58,7 @@ app.use('/api/auth/', authRoutes);
 // app.use('/api/jobs', jobRoutes);
 
 app.options('/api/profile/', (req, res) => {
-    res.status(200).send(); // Respond with an HTTP OK (200) for preflight requests
+    res.status(200).send(); 
   });
 
 app.use('/api/profile/', profileRoutes);
