@@ -63,6 +63,10 @@ export async function checkEmail(req, res) {
 }
 
 // Function to fetch user details using JWT token
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
+import { jwtSecret } from '../config';
+
 export async function updateUserDetails(req, res) {
     try {
         // Extract token from authorization header
@@ -81,14 +85,15 @@ export async function updateUserDetails(req, res) {
         // Update user details with the data from the request body
         const { username, email, about, githubLink, linkedInLink, portfolioLink, tags, profileImage } = req.body;
 
-        if (username) user.username = username;
-        if (email) user.email = email;
-        if (about) user.about = about;
-        if (githubLink) user.githubLink = githubLink;
-        if (linkedInLink) user.linkedInLink = linkedInLink;
-        if (portfolioLink) user.portfolioLink = portfolioLink;
-        if (tags) user.tags = tags;
-        if (profileImage) user.profileImage = profileImage; // Handle profile image update
+        // Set fields to null if they are empty or not provided
+        user.username = username !== undefined ? username : null;
+        user.email = email !== undefined ? email : null;
+        user.about = about !== undefined ? about : null;
+        user.githubLink = githubLink !== undefined ? githubLink : null;
+        user.linkedInLink = linkedInLink !== undefined ? linkedInLink : null;
+        user.portfolioLink = portfolioLink !== undefined ? portfolioLink : null;
+        user.tags = tags !== undefined ? tags : [];
+        user.profileImage = profileImage !== undefined ? profileImage : null;
 
         // Save the updated user back to the database
         const updatedUser = await user.save();
@@ -108,6 +113,7 @@ export async function updateUserDetails(req, res) {
         res.status(500).send('Error updating user details');
     }
 }
+
 
 export async function getUserDetails(req, res) {
     try {
