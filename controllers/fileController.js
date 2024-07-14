@@ -2,9 +2,20 @@ import jwt from 'jsonwebtoken';
 import Image from '../models/imageModel.js';
 import User from '../models/userModel.js';
 import { jwtSecret } from '../config.js';
-import upload from '../middleware/uploadMiddleware.js';
+import { storage } from '../firebaseConfig.js';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-export async function uploadImages(req, res) {
+const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
+  const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
+  const snapshot = await uploadBytes(fileRef, fileBuffer);
+  const publicUrl = await getDownloadURL(snapshot.ref);
+  return publicUrl;
+};
+
+export const uploadImages = async (req, res) => {
+  console.log("Files:", req.files); // Should log files
+  console.log("Body:", req.body);   // Body should be empty, that's expected
+
   try {
     // Extract token from authorization header
     const token = req.headers.authorization.split(' ')[1];
@@ -20,39 +31,43 @@ export async function uploadImages(req, res) {
       return res.status(404).send('User not found');
     }
 
-    // Handle file upload
-    upload(req, res, async (err) => {
-      if (err) {
-        console.error('File upload error:', err.message);
-        return res.status(400).send('File upload error');
-      }
+    // Ensure both images are provided
+    if (!req.files || !req.files.originalImage || !req.files.compressedImage) {
+      return res.status(400).send('Both images are required');
+    }
 
-      // Get the uploaded file details
-      const originalImage = req.files.originalImage ? req.files.originalImage[0] : null;
-      const compressedImage = req.files.compressedImage ? req.files.compressedImage[0] : null;
+    const originalImage = req.files.originalImage[0];
+    const compressedImage = req.files.compressedImage[0];
 
-      if (!originalImage || !compressedImage) {
-        return res.status(400).send('Both images are required');
-      }
+    // Upload images to Firebase Storage
+    const originalImageUrl = await uploadFileToFirebase(
+      originalImage.buffer,
+      originalImage.originalname,
+      'images/original'
+    );
+    const compressedImageUrl = await uploadFileToFirebase(
+      compressedImage.buffer,
+      compressedImage.originalname,
+      'images/compressed'
+    );
 
-      // Save image metadata to the database
-      const image = new Image({
-        userId: user._id,
-        originalImagePath: `/uploads/images/original/${originalImage.filename}`,
-        compressedImagePath: `/uploads/images/compressed/${compressedImage.filename}`
-      });
+    // Save image metadata to the database
+    const image = new Image({
+      userId: user._id,
+      originalImage: originalImageUrl,
+      compressedImage: compressedImageUrl,
+    });
 
-      await image.save();
+    await image.save();
 
-      // Send response with image details
-      res.json({
-        message: 'Images uploaded successfully',
-        imageData: {
-          originalImageUrl: image.originalImagePath,
-          compressedImageUrl: image.compressedImagePath
-        },
-        user
-      });
+    // Send response with image details
+    res.json({
+      message: 'Images uploaded successfully',
+      imageData: {
+        originalImageUrl: image.originalImage,
+        compressedImageUrl: image.compressedImage,
+      },
+      user,
     });
   } catch (error) {
     console.error('Error during file upload:', error.message, error.stack);
@@ -67,4 +82,4 @@ export async function uploadImages(req, res) {
 
     res.status(500).send('Error during file upload');
   }
-}
+};
