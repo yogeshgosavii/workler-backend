@@ -62,10 +62,7 @@ export async function checkEmail(req, res) {
     }
 }
 
-// Function to fetch user details using JWT token
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
-import { jwtSecret } from '../config';
+
 
 export async function updateUserDetails(req, res) {
     try {
