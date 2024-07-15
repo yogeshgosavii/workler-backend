@@ -62,6 +62,19 @@ export async function checkEmail(req, res) {
     }
 }
 
+export async function checkUsername(req, res) {
+    const { username } = req.body;
+    try {
+        // Check if there is a user with the provided email
+        const user = await User.findOne({ username });
+        res.json({ exists: !!user });
+    } catch (error) {
+        console.error('Error checking username:', error.message, error.stack);
+        res.status(500).send('Error checking username');
+    }
+}
+
+
 
 
 export async function updateUserDetails(req, res) {
