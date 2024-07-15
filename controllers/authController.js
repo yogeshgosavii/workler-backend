@@ -64,6 +64,7 @@ export async function checkEmail(req, res) {
 
 export async function checkUsername(req, res) {
     const { username } = req.body;
+    console.log(username);
     try {
         // Check if there is a user with the provided email
         const user = await User.findOne({ username });
