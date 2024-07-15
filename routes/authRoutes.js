@@ -4,10 +4,11 @@ import { signup, login,checkUsername, checkEmail ,updateUserDetails , getUserDet
 
 import { protect } from '../middleware/authMiddleware.js';
 
-// router.post('/signup', signup);
+router.post('/signup', signup);
 router.post('/login', login);
 router.post('/check-email', checkEmail);
 router.post('/check-username', checkUsername);
+
 
 
 // Example of protecting a route with authentication middleware
