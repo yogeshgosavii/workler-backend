@@ -11,7 +11,6 @@ router.post('/check-username', checkUsername);
 
 
 
-// Example of protecting a route with authentication middleware
 router.route('/user').get(getUserDetails);
 router.route('/update-user').put(updateUserDetails);
 
