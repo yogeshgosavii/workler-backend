@@ -15,7 +15,7 @@ const jobSchema = new Schema({
     location : {type:String},
     job_type : {type:String},
     skills_required: {type : [String]},
-    experience_type : {type : [String]},
+    experience_type : {type : String},
     min_experience : {type: Number},
     max_experience : {type : Number},
     job_tags : {type : [String]},
