@@ -5,11 +5,11 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-router.route('/jobs')
+router.route('/job')
   .post(protect, addJob)
   .get(protect, getJobs);
 
-router.route('/jobs/:id')
+router.route('/job/:id')
   .put(protect, updateJob)
   .delete(protect, deleteJob);
 
