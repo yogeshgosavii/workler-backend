@@ -55,7 +55,7 @@ app.options('/api/auth/', (req, res) => {
   });
   
 app.use('/api/auth/', authRoutes);
-// app.use('/api/jobs', jobRoutes);
+app.use('/api/jobs', jobRoutes);
 
 app.options('/api/profile/', (req, res) => {
     res.status(200).send(); 
