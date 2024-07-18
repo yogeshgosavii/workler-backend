@@ -20,7 +20,7 @@ const jobSchema = new Schema({
     max_experience : {type : Number},
     job_tags : {type : [String]},
     company_logo : {type : String},
-    job_url : {type:URL, },
+    job_url : {type:String, },
     job_post_date : {type : Date}
 });
 

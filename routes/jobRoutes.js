@@ -1,5 +1,5 @@
-const express = require('express');
-const {getJobs,addJob,updateJob,deleteJob } = require('../controllers/jobController');
+import express from 'express';
+import {getJobs,addJob,updateJob,deleteJob } from '../controllers/jobController.js';
 import { protect } from '../middleware/authMiddleware.js';
 
 
@@ -9,8 +9,8 @@ router.route('/jobs')
   .post(protect, addJob)
   .get(protect, getJobs);
 
-router.route('/skills/:id')
+router.route('/jobs/:id')
   .put(protect, updateJob)
   .delete(protect, deleteJob);
 
-module.exports = router;
+export default router;
