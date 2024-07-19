@@ -2,10 +2,12 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import authRoutes from './routes/authRoutes.js'; // Ensure authRoutes is properly exported
-import jobRoutes from './routes/jobRoutes.js'; // Uncomment if needed
-import profileRoutes from './routes/profileRoutes.js'; // Uncomment if needed
-import fileRoutes from './routes/fileRoutes.js'; // Uncomment if needed
+import authRoutes from './routes/authRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import profileRoutes from './routes/profileRoutes.js';
+import fileRoutes from './routes/fileRoutes.js';
+import locationRoutes from './routes/locationRoutes.js'; 
+
 
 dotenv.config();
 
@@ -64,6 +66,8 @@ app.options('/api/profile/', (req, res) => {
 app.use('/api/profile/', profileRoutes);
 
 app.use('/api/files/', fileRoutes );
+
+app.use('/api/location/', locationRoutes );
 
 
 export default app;

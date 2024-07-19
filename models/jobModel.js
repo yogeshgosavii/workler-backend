@@ -21,7 +21,9 @@ const jobSchema = new Schema({
     job_tags : {type : [String]},
     company_logo : {type : String},
     job_url : {type:String, },
-    job_post_date : {type : Date}
+    job_post_date : {type : Date},
+    candidate_applied :{type : Number},
+    candidate_limit : {type : Number}
 });
 
 const Job = model('Job', jobSchema);
