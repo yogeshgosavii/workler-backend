@@ -1,11 +1,11 @@
 import express from 'express';
 import { protect } from '../middleware/authMiddleware.js';
-import {getlocationPlace} from "../controllers/locationController.js"
+import {getLocationPlace} from "../controllers/locationController.js"
 
 const router = express.Router();
 
 router.route('/place')
-  .get(protect, getlocationPlace);
+  .get(protect, getLocationPlace);
 
   export default router;
 

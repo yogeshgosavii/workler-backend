@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-
+import Location from './locationModel.js'
 const jobSchema = new Schema({
     user: {
         type: Schema.Types.ObjectId,
@@ -12,7 +12,7 @@ const jobSchema = new Schema({
     source : {type : String},
     description: { type: String, required: true },
     company_name : {type :String },
-    location : {type:String},
+    location : {type:Location},
     job_type : {type:String},
     skills_required: {type : [String]},
     experience_type : {type : String},
