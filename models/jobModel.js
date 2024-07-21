@@ -22,6 +22,7 @@ const jobSchema = new Schema({
     company_logo : {type : String},
     job_url : {type:String, },
     job_post_date : {type : Date},
+    job_update_date : {type :Date},
     candidates_applied :{type : Number},
     candidate_limit : {type : Number}
 });
