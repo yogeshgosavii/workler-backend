@@ -1,5 +1,4 @@
-import { Schema as _Schema } from 'mongoose';
-const Schema = _Schema;
+import { Schema } from 'mongoose';
 
 const locationSchema = new Schema({
     lon: { type: Number},

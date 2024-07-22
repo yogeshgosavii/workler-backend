@@ -1,20 +1,21 @@
 // personalDetailsModel.js
 
-import { Schema, model } from 'mongoose';
+import { Schema } from 'mongoose';
+import Location from './locationModel.js'
 
 const personalDetailsSchema = new Schema({
-  user: {
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: 'User'
-  },
-  fullname: String,
+  firstname: String,
+  lastname : String,
   phone:Number,
-  address:String,
-  birthdate : Date
+  bio : String,
+  about : String,
+  location:{type : Location},
+  birthdate : Date,
+  working_at : String,
+  website : String
   // Add other fields as needed
 });
 
-const PersonalDetails = model('PersonalDetails', personalDetailsSchema);
+// const PersonalDetails = model('PersonalDetails', personalDetailsSchema);
 
-export default PersonalDetails;
+export default personalDetailsSchema;
