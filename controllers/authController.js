@@ -11,11 +11,41 @@ export const testAuth = (req, res) => {
 
 // Function to handle user signup
 export async function signup(req, res) {
-    const { email, password, username, birthDate, accountType } = req.body;
+    console.log('Request body:', req.body);
+    const { email, password, username, account_type, company_details } = req.body;
+
+    // Log each field to ensure they are received correctly
+    console.log('Email:', email);
+    console.log('Password:', password);
+    console.log('Username:', username);
+    console.log('Account Type:', account_type);
+    console.log('Company Details:', company_details);
+
+    // Validate inputs
+    if (!email || !password || !username || !account_type) {
+        return res.status(400).send('All fields are required');
+    }
+
     try {
+        // Check if email already exists
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            return res.status(409).send('Email already in use');
+        }
+
+        // Check if username already exists
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) {
+            return res.status(409).send('Username already in use');
+        }
+
+        // Log before hashing the password
+        console.log('Hashing password:', password);
         // Hash the password before saving it
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ email, password: hashedPassword, username, birthDate, accountType });
+        console.log('Password hashed successfully:', hashedPassword);
+
+        const user = new User({ email, password: hashedPassword, username, account_type, company_details });
         await user.save();
         console.log(`User created: ${user.email}`);
         res.status(201).send('User created successfully');
@@ -75,9 +105,6 @@ export async function checkUsername(req, res) {
     }
 }
 
-
-
-
 export async function updateUserDetails(req, res) {
     try {
         // Extract token from authorization header
@@ -124,7 +151,6 @@ export async function updateUserDetails(req, res) {
         res.status(500).send('Error updating user details');
     }
 }
-
 
 export async function getUserDetails(req, res) {
     try {
