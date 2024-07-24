@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema({
   tags: { type: [String] },
   profileImage: { type: String }, 
   profileImageCompressed: { type: String },
+  followers : {type :Number},
+  following  : {type : Number},
   personal_details: { type: PersonalDetails },
   company_details: { type: CompanyDetails },
 });

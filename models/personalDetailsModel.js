@@ -12,7 +12,7 @@ const personalDetailsSchema = new Schema({
   location:{type : Location},
   birthdate : Date,
   working_at : String,
-  website : String
+  portfolio : String
   // Add other fields as needed
 });
 
