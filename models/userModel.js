@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema({
   account_type: { type: String },
   githubLink: { type: String },
   linkedInLink: { type: String },
+  bio : {type : String},
   tags: { type: [String] },
   profileImage: { type: String }, 
   profileImageCompressed: { type: String },
