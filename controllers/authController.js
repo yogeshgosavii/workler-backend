@@ -121,7 +121,7 @@ export async function updateUserDetails(req, res) {
         }
         
         // Update user details with the data from the request body
-        const { username, email, about, githubLink, linkedInLink, portfolioLink, tags, profileImage } = req.body;
+        const { username, email, about, githubLink,bio, linkedInLink, portfolioLink, tags, profileImage } = req.body;
 
         // Set fields to null if they are empty or not provided
         user.username = username !== undefined ? username : null;
@@ -132,6 +132,8 @@ export async function updateUserDetails(req, res) {
         user.portfolioLink = portfolioLink !== undefined ? portfolioLink : null;
         user.tags = tags !== undefined ? tags : [];
         user.profileImage = profileImage !== undefined ? profileImage : null;
+        user.bio = bio !== undefined ? bio : null;
+
 
         // Save the updated user back to the database
         const updatedUser = await user.save();
