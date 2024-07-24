@@ -7,9 +7,7 @@ const personalDetailsSchema = new Schema({
   firstname: String,
   lastname : String,
   phone:Number,
-  bio : String,
   about : String,
-  location:{type : Location},
   birthdate : Date,
   working_at : String,
   portfolio : String

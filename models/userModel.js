@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import PersonalDetails from './personalDetailsModel.js';
 import CompanyDetails from './companyModel.js';
+import Location from './locationModel.js'
+
 
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
@@ -11,6 +13,7 @@ const userSchema = new mongoose.Schema({
   linkedInLink: { type: String },
   bio : {type : String},
   tags: { type: [String] },
+  location:{type : Location},
   profileImage: { type: String }, 
   profileImageCompressed: { type: String },
   followers : {type :Number},
