@@ -106,6 +106,7 @@ export async function checkUsername(req, res) {
 }
 
 export async function updateUserDetails(req, res) {
+    console.log(req.body)
     try {
         // Extract token from authorization header
         const token = req.headers.authorization.split(' ')[1];
@@ -121,12 +122,12 @@ export async function updateUserDetails(req, res) {
         }
         
         // Update user details with the data from the request body
-        const { username, email,location, about,personal_details,company_details , githubLink,bio, linkedInLink, portfolioLink, tags, profileImage } = req.body;
+        const { username, email,location, description,personal_details,company_details , githubLink,bio, linkedInLink, portfolioLink, tags, profileImage } = req.body;
 
         // Set fields to null if they are empty or not provided
         user.username = username !== undefined ? username : null;
         user.email = email !== undefined ? email : null;
-        user.about = about !== undefined ? about : null;
+        user.description = description !== undefined ? description : null;
         user.githubLink = githubLink !== undefined ? githubLink : null;
         user.linkedInLink = linkedInLink !== undefined ? linkedInLink : null;
         user.portfolioLink = portfolioLink !== undefined ? portfolioLink : null;
