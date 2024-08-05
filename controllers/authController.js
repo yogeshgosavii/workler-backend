@@ -12,7 +12,7 @@ export const testAuth = (req, res) => {
 // Function to handle user signup
 export async function signup(req, res) {
     console.log('Request body:', req.body);
-    const { email, password, username, account_type, company_details } = req.body;
+    const { email, password, username,location, account_type, company_details ,personal_details } = req.body;
 
     // Log each field to ensure they are received correctly
     console.log('Email:', email);
@@ -20,6 +20,8 @@ export async function signup(req, res) {
     console.log('Username:', username);
     console.log('Account Type:', account_type);
     console.log('Company Details:', company_details);
+    console.log('Personal Details:', personal_details);
+
 
     // Validate inputs
     if (!email || !password || !username || !account_type) {
@@ -45,7 +47,15 @@ export async function signup(req, res) {
         const hashedPassword = await bcrypt.hash(password, 10);
         console.log('Password hashed successfully:', hashedPassword);
 
-        const user = new User({ email, password: hashedPassword, username, account_type, company_details });
+        let user;
+        if(account_type == "Employeer"){
+         user = new User({ email, password: hashedPassword, username,location, account_type, company_details });
+
+        }
+        else{
+         user = new User({ email, password: hashedPassword, username,location, account_type, personal_details });
+
+        }
         await user.save();
         console.log(`User created: ${user.email}`);
         res.status(201).send('User created successfully');
@@ -106,58 +116,66 @@ export async function checkUsername(req, res) {
 }
 
 export async function updateUserDetails(req, res) {
-    console.log(req.body)
+    console.log("Images:", req.images);
+    console.log("Body:", req.body);
+
     try {
-        // Extract token from authorization header
-        const token = req.headers.authorization.split(' ')[1];
-        
-        // Verify and decode the token
-        const decoded = jwt.verify(token, jwtSecret);
-        
-        // Find user by decoded user ID from token, exclude password field
-        const user = await User.findById(decoded.userId).select('-password');
-        
+        // Assuming `req.user` is set by some authentication middleware
+        const user = req.user;
+
         if (!user) {
             return res.status(404).send('User not found');
         }
-        
+
         // Update user details with the data from the request body
-        const { username, email,location, description,personal_details,company_details , githubLink,bio, linkedInLink, portfolioLink, tags, profileImage } = req.body;
+        const { 
+            username, email, location, description, personal_details, 
+            company_details, githubLink, bio, linkedInLink, 
+            portfolioLink, tags 
+        } = req.body;
 
-        // Set fields to null if they are empty or not provided
-        user.username = username !== undefined ? username : null;
-        user.email = email !== undefined ? email : null;
-        user.description = description !== undefined ? description : null;
-        user.githubLink = githubLink !== undefined ? githubLink : null;
-        user.linkedInLink = linkedInLink !== undefined ? linkedInLink : null;
-        user.portfolioLink = portfolioLink !== undefined ? portfolioLink : null;
-        user.tags = tags !== undefined ? tags : [];
-        user.profileImage = profileImage !== undefined ? profileImage : null;
-        user.bio = bio !== undefined ? bio : null;
-        user.location = location !== undefined ? location : null;
-        user.personal_details = personal_details !== undefined ? personal_details : null;
-        user.company_details = company_details !== undefined ? company_details : null;
-
-
+        // Update user fields if new values are provided, otherwise keep existing values
+        user.username = username !== undefined ? username : user.username;
+        user.email = email !== undefined ? email : user.email;
+        user.description = description !== undefined ? description : user.description;
+        user.githubLink = githubLink !== undefined ? githubLink : user.githubLink;
+        user.linkedInLink = linkedInLink !== undefined ? linkedInLink : user.linkedInLink;
+        user.portfolioLink = portfolioLink !== undefined ? portfolioLink : user.portfolioLink;
+        user.tags = tags !== undefined ? tags : user.tags;
+        user.profileImage = req.images !== undefined ? req.images : user.profileImage;
+        user.bio = bio !== undefined ? bio : user.bio;
+        user.location = location !== undefined ? location : user.location;
+        user.personal_details = personal_details !== undefined ? personal_details : user.personal_details;
+        user.company_details = company_details !== undefined ? company_details : user.company_details;
 
         // Save the updated user back to the database
         const updatedUser = await user.save();
 
-        res.json(updatedUser);
+        // Ensure response is sent only once
+        if (!res.headersSent) {
+            res.json(updatedUser);
+        }
     } catch (error) {
-        console.error('Update user details error:', error.message, error.stack);
+        console.error('Update user details error:', error.message);
 
         if (error instanceof jwt.TokenExpiredError) {
-            return res.status(401).send('Token expired');
+            if (!res.headersSent) {
+                return res.status(401).send('Token expired');
+            }
         }
 
         if (error.name === 'JsonWebTokenError') {
-            return res.status(401).send('Invalid token');
+            if (!res.headersSent) {
+                return res.status(401).send('Invalid token');
+            }
         }
 
-        res.status(500).send('Error updating user details');
+        if (!res.headersSent) {
+            res.status(500).send('Error updating user details');
+        }
     }
 }
+
 
 export async function getUserDetails(req, res) {
     try {

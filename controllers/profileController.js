@@ -1,17 +1,13 @@
 import asyncHandler from 'express-async-handler';
 import Skill from '../models/skillModel.js';
 import Education from '../models/educationModel.js';
-import PersonalDetails from '../models/personalDetailsModel.js';
 import ProjectDetails from '../models/projectModel.js';
 import WorkExperience from '../models/workExperienceModel.js';
-import Description from '../models/descriptionModel.js';
 
 // Helper function to handle async/await and error responses
 const handleCreate = (Model) => async (req, res) => {
-  console.log(req)
   try {
     const data = new Model({ ...req.body, user: req.user._id });
-    console.log(data)
     await data.save();
     res.status(201).json(data);
   } catch (error) {
@@ -54,34 +50,15 @@ const handleDelete = (Model) => async (req, res) => {
     const data = await Model.findByIdAndDelete(id);
 
     if (!data) {
-      return res.status(401).json({ message: 'Not authorized' });
+      return res.status(404).json({ message: 'Not found' });
     }
 
-    // Return a success message as JSON
     return res.status(200).json({ message: 'Deletion successful' });
   } catch (error) {
     console.error('Error:', error);
     return res.status(500).json({ message: 'Server Error' });
   }
 };
-
-// CRUD operations for Skill
-export const addSkill = asyncHandler(handleCreate(Skill));
-export const getSkills = asyncHandler(handleGetAll(Skill));
-export const updateSkill = asyncHandler(handleUpdate(Skill));
-export const deleteSkill = asyncHandler(handleDelete(Skill));
-
-// CRUD operations for Education
-export const addEducation = asyncHandler(handleCreate(Education));
-export const getEducation = asyncHandler(handleGetAll(Education));
-export const updateEducation = asyncHandler(handleUpdate(Education));
-export const deleteEducation = asyncHandler(handleDelete(Education));
-
-// CRUD operations for Personal Details
-export const addPersonalDetails = asyncHandler(handleCreate(PersonalDetails));
-export const getPersonalDetails = asyncHandler(handleGetAll(PersonalDetails));
-export const updatePersonalDetails = asyncHandler(handleUpdate(PersonalDetails));
-export const deletePersonalDetails = asyncHandler(handleDelete(PersonalDetails));
 
 // CRUD operations for Project Details
 export const addProjectDetails = asyncHandler(handleCreate(ProjectDetails));
@@ -95,8 +72,16 @@ export const getWorkExperience = asyncHandler(handleGetAll(WorkExperience));
 export const updateWorkExperience = asyncHandler(handleUpdate(WorkExperience));
 export const deleteWorkExperience = asyncHandler(handleDelete(WorkExperience));
 
-// CRUD operations for Description
-export const addDescription = asyncHandler(handleCreate(Description));
-export const getDescription = asyncHandler(handleGetAll(Description));
-export const updateDescription = asyncHandler(handleUpdate(Description));
-export const deleteDescription = asyncHandler(handleDelete(Description));
+// CRUD operations for Education
+export const addEducation = asyncHandler(handleCreate(Education));
+export const getEducation = asyncHandler(handleGetAll(Education));
+export const updateEducation = asyncHandler(handleUpdate(Education));
+export const deleteEducation = asyncHandler(handleDelete(Education));
+
+// CRUD operations for Skill
+export const addSkill = asyncHandler(handleCreate(Skill));
+export const getSkills = asyncHandler(handleGetAll(Skill));
+export const updateSkill = asyncHandler(handleUpdate(Skill));
+export const deleteSkill = asyncHandler(handleDelete(Skill));
+
+

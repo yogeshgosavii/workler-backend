@@ -3,10 +3,8 @@ import { protect } from '../middleware/authMiddleware.js';
 import {
   addSkill, getSkills, updateSkill, deleteSkill,
   addEducation, getEducation, updateEducation, deleteEducation,
-  addPersonalDetails, getPersonalDetails, updatePersonalDetails, deletePersonalDetails,
   addProjectDetails, getProjectDetails, updateProjectDetails, deleteProjectDetails,
   addWorkExperience, getWorkExperience, updateWorkExperience, deleteWorkExperience,
-  addDescription, getDescription, updateDescription, deleteDescription
 } from '../controllers/profileController.js';
 
 const router = express.Router();
@@ -29,14 +27,7 @@ router.route('/education/:id')
   .put(protect, updateEducation)
   .delete(protect, deleteEducation);
 
-// Routes for Personal Details
-router.route('/personalDetails')
-  .post(protect, addPersonalDetails)
-  .get(protect, getPersonalDetails);
 
-router.route('/personalDetails/:id')
-  .put(protect, updatePersonalDetails)
-  .delete(protect, deletePersonalDetails);
 
 // Routes for Project Details
 router.route('/projectDetails')
@@ -57,12 +48,6 @@ router.route('/workExperience/:id')
   .delete(protect, deleteWorkExperience);
 
 // Routes for Description
-router.route('/description')
-  .post(protect, addDescription)
-  .get(protect, getDescription);
 
-router.route('/description/:id')
-  .put(protect, updateDescription)
-  .delete(protect, deleteDescription);
 
 export default router;

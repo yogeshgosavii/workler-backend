@@ -1,10 +1,12 @@
 import mongoose from 'mongoose';
 
+// Define the image schema
 const imageSchema = new mongoose.Schema({
-    originalImage: { type: String }, 
-    compressedImage : {type : String}
+  originalImage: { type: [String] }, // Array of original image URLs
+  compressedImage: { type: [String] } // Array of compressed image URLs
 });
 
-const Image = mongoose.model('Image', imageSchema);
+// Create and export the Image model
+// const Image = mongoose.model('Image', imageSchema);
 
-export default Image;
+export default imageSchema;

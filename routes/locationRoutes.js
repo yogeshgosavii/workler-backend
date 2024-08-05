@@ -5,7 +5,7 @@ import {getLocationPlace} from "../controllers/locationController.js"
 const router = express.Router();
 
 router.route('/place')
-  .get(protect, getLocationPlace);
+  .get( getLocationPlace);
 
   export default router;
 

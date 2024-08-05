@@ -10,7 +10,8 @@ const personalDetailsSchema = new Schema({
   about : String,
   birthdate : Date,
   working_at : String,
-  portfolio : String
+  portfolio : String,
+  gender : String
   // Add other fields as needed
 });
 

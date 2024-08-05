@@ -5,7 +5,8 @@ import cors from 'cors';
 import authRoutes from './routes/authRoutes.js';
 import jobRoutes from './routes/jobRoutes.js';
 import profileRoutes from './routes/profileRoutes.js';
-import fileRoutes from './routes/fileRoutes.js';
+import imageRoutes from './routes/imageRoutes.js';
+import postRoutes from './routes/postRoutes.js';
 import locationRoutes from './routes/locationRoutes.js'; 
 
 
@@ -65,7 +66,10 @@ app.options('/api/profile/', (req, res) => {
 
 app.use('/api/profile/', profileRoutes);
 
-app.use('/api/files/', fileRoutes );
+app.use('/api/images/', imageRoutes);
+
+
+app.use('/api/posts/', postRoutes );
 
 app.use('/api/location/', locationRoutes );
 

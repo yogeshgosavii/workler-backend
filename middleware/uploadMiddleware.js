@@ -1,10 +1,15 @@
 import multer from 'multer';
 
-// Configure multer to use memory storage
-const storage = multer.memoryStorage(); // Store files in memory
-const upload = multer({ storage }).fields([
-  { name: 'originalImage', maxCount: 1 }, // Field name and maximum count of files
-  { name: 'compressedImage', maxCount: 1 }
-]);
+// Function to configure multer with dynamic field names and counts
+const configureUpload = (maxCount) => {
+  const storage = multer.memoryStorage(); // Store files in memory
 
-export default upload;
+  // Create multer upload instance with the specified fields
+  const upload = multer({ storage }).fields([
+    { name: 'images', maxCount } 
+  ]);
+
+  return upload;
+};
+
+export default configureUpload;
