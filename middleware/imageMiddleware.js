@@ -4,10 +4,15 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Image from '../models/imageModel.js'; // Ensure this path is correct
 
 const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
-  const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
-  const snapshot = await uploadBytes(fileRef, fileBuffer);
-  const publicUrl = await getDownloadURL(snapshot.ref);
-  return publicUrl;
+  try {
+    const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
+    const snapshot = await uploadBytes(fileRef, fileBuffer);
+    const publicUrl = await getDownloadURL(snapshot.ref);
+    return publicUrl;
+  } catch (error) {
+    console.error('Error uploading file to Firebase:', error.message);
+    throw new Error('File upload failed');
+  }
 };
 
 const compressImage = async (imageBuffer) => {
@@ -38,34 +43,36 @@ export const imageMiddleware = async (req, res, next) => {
     }
 
     const uploadedImageUrls = await Promise.all(originalImages.map(async (image) => {
-      const compressedImageBuffer = await compressImage(image.buffer);
+      try {
+        const compressedImageBuffer = await compressImage(image.buffer);
 
-      const originalImageUrl = await uploadFileToFirebase(
-        image.buffer,
-        image.originalname,
-        'images/original'
-      );
+        const originalImageUrl = await uploadFileToFirebase(
+          image.buffer,
+          image.originalname,
+          'images/original'
+        );
 
-      const compressedImageUrl = await uploadFileToFirebase(
-        compressedImageBuffer,
-        `compressed_${image.originalname}`,
-        'images/compressed'
-      );
+        const compressedImageUrl = await uploadFileToFirebase(
+          compressedImageBuffer,
+          `compressed_${image.originalname}`,
+          'images/compressed'
+        );
 
-      return {
-        originalImage: originalImageUrl,
-        compressedImage: compressedImageUrl
-      };
+        return {
+          originalImage: originalImageUrl,
+          compressedImage: compressedImageUrl
+        };
+      } catch (error) {
+        console.error('Error processing image:', error.message);
+        throw new Error('Image processing failed');
+      }
     }));
 
-    // Save image metadata to the database
-    const images= {
+    // Save image metadata to the database (if needed)
+    const images = {
       originalImage: uploadedImageUrls.map(urls => urls.originalImage),
       compressedImage: uploadedImageUrls.map(urls => urls.compressedImage)
     };
-
-    // const newImage = imageRecords;
-    // await newImage.save();
 
     req.images = images;
     next();
