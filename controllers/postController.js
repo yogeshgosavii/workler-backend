@@ -55,15 +55,26 @@ const handleGetById = (Model) => async (req, res) => {
 
 // Update a document by ID
 const handleUpdate = (Model) => async (req, res) => {
+
+  const { user,
+  likes_count,
+  likes,
+  comments_count,
+  comments,
+  images,  
+  content,
+  post_type} = req.body
   try {
     const { id } = req.params;
     const data = await Model.findById(id);
 
-    if (!data || data.user.toString() !== req.user?._id.toString()) {
-      return res.status(401).json({ message: 'Not authorized' });
-    }
-
+    // if (!data || data.user.toString() !== req.user?._id.toString()) {
+    //   return res.status(401).json({ message: 'Not authorized' });
+    // }
     Object.assign(data, req.body);
+
+    data.likes = likes == []? null:likes
+    data.comments = comments == []?null:comments
     const updatedData = await data.save();
     res.json(updatedData);
   } catch (error) {

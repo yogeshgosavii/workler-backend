@@ -9,16 +9,20 @@ const postSchema = new Schema({
     required: true,
     ref: "User",
   },
-  likesCount: Number,
+  likes_count: {
+    type: Number,
+    default: 0
+  },
   likes: [likeSchema],
-  commentsCount: Number,
-  comments :[commentSchema],
-  images : imageSchema,
-  timestamp : Date,
-  content : String,
-  post_type : String
-
-});
+  comments_count: {
+    type: Number,
+    default: 0
+  },
+  comments: [commentSchema],
+  images: imageSchema,  
+  content: String,
+  post_type: String
+}, { timestamps: true }); 
 
 const Posts = model("Posts", postSchema);
 

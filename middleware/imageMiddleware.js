@@ -28,8 +28,8 @@ export const imageMiddleware = async (req, res, next) => {
   console.log('Body:', req.body);
 
   try {
-    if (!req.files || !req.files.images) {
-      next();
+    if (!req.files || !req.files.images || req.files.images.length === 0) {
+      return next();
     }
 
     const originalImages = req.files.images;

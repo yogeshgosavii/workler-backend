@@ -23,5 +23,9 @@ router.route("all-posts")
   .put(protect, updatePost)
   .delete(protect, deletePost);
 
+  router.route('/post/:id/like')
+  .put(protect,updatePost)
+
+
 
 export default router;
