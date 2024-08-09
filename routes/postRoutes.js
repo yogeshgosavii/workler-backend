@@ -1,7 +1,7 @@
 import express from 'express';
 import { imageMiddleware } from '../middleware/imageMiddleware.js';
 import {
-addPost,deletePost,getPosts,
+addPost,addJobPost,deletePost,getPosts,
   getUserPosts,
 updatePost} from '../controllers/postController.js';
 import { protect } from '../middleware/authMiddleware.js';
@@ -15,6 +15,9 @@ const upload = customUpload(5)
 router.route('/post')
   .post(protect,upload,imageMiddleware, addPost)
   .get(protect,getUserPosts);
+
+  router.route('/post/job-post')
+  .post(protect,addJobPost)
 
 router.route("all-posts")
   .get(protect,getPosts)

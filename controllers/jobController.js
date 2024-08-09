@@ -1,5 +1,5 @@
 import asyncHandler from 'express-async-handler';
-import Job from '../models/jobModel.js';
+import {Job} from '../models/jobModel.js';
 
 
 // Helper function to handle async/await and error responses
@@ -16,6 +16,31 @@ const handleCreate = (Model) => async (req, res) => {
   }
 };
 
+const handleCreateMultiple = (Model) => async (req, res) => {
+  try {
+    const jobsData = req.body; // Assuming jobs array is sent in req.body.jobs
+
+    console.log("jobsData",jobsData);
+    
+    if (!Array.isArray(jobsData)) {
+      return res.status(400).send('Expected an array of jobs');
+    }
+
+    const jobs = jobsData.map(job => ({
+      ...job,
+      user: req.user._id // Assign the user ID to each job
+    }));
+
+    const createdJobs = await Model.insertMany(jobs); // Save all jobs at once
+
+    res.status(201).json(createdJobs);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
+
 const handleGetAll = (Model) => async (req, res) => {
   try {
     const data = await Model.find({ user: req.user?._id });
@@ -25,6 +50,30 @@ const handleGetAll = (Model) => async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
+const handleGetById = (Model) => async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find the document by ID
+    const data = await Model.findById(id).populate('user'); // You can populate any referenced fields if needed
+
+    if (!data) {
+      return res.status(404).send('Resource not found');
+    }
+
+    // Ensure the user is authorized to view this document
+    if (data.user.toString() !== req.user._id.toString()) {
+      return res.status(403).send('Unauthorized');
+    }
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 
 const handleUpdate = (Model) => async (req, res) => {
   try {
@@ -63,7 +112,9 @@ const handleDelete = (Model) => async (req, res) => {
 
 // CRUD operations for Job
 export const addJob = asyncHandler(handleCreate(Job));
+export const addMultipleJob = asyncHandler(handleCreateMultiple(Job));
 export const getJobs = asyncHandler(handleGetAll(Job));
+export const getJobsById = asyncHandler(handleGetById(Job));
 export const updateJob = asyncHandler(handleUpdate(Job));
 export const deleteJob = asyncHandler(handleDelete(Job));
 

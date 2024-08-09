@@ -14,16 +14,35 @@ const handleCreate = (Model) => async (req, res) => {
   }
 };
 
+const handleCreateJobPost = (Model) => async (req, res) => {
+  try {
+    const data = new Model({ ...req.body  , user: req.user._id });
+    await data.save();
+    res.status(201).json(data);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 // Get all documents for a specific user
 const handleUserGetAll = (Model) => async (req, res) => {
   try {
-    const data = await Model.find({ user: req.user?._id });
+    const data = await Model.find({ user: req.user?._id })
+      .populate({
+        path: 'jobs', // The field to populate
+        model: 'Job', // The model to use for populating
+        // Optional: Specify fields to include in the populated documents
+        select: 'job_role company_name job_tags job_url' 
+      });
+
     res.json(data);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
 };
+
 
 // Get all documents (e.g., public posts)
 const handleGetAll = (Model) => async (req, res) => {
@@ -102,6 +121,7 @@ const handleDelete = (Model) => async (req, res) => {
 
 // CRUD operations for Post
 export const addPost = asyncHandler(handleCreate(Post));
+export const addJobPost = asyncHandler(handleCreateJobPost(Post));
 export const getUserPosts = asyncHandler(handleUserGetAll(Post));
 export const getPosts = asyncHandler(handleGetAll(Post));
 export const getPostById = asyncHandler(handleGetById(Post));  // New export
