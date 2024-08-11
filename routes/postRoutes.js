@@ -29,6 +29,9 @@ router.route("all-posts")
   router.route('/post/:id/like')
   .put(protect,updatePost)
 
+  router.route('/post/:id/comment')
+  .put(protect,updatePost)
+
 
 
 export default router;

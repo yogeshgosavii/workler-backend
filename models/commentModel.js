@@ -6,7 +6,8 @@ const commentSchema = new mongoose.Schema({
         required: true,
         ref: 'User'
       },
-    commentMessage : String
-})
+    comment_text : String
+}, { timestamps: true })
+
 
 export default commentSchema

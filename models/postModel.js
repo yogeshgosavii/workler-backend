@@ -26,7 +26,10 @@ const postSchema = new Schema(
     content: String,
     post_type: String,
   },
-  { timestamps: true }
+  {
+    timestamps: true, 
+    versionKey: false, 
+  }
 );
 
 const Posts = model("Posts", postSchema);
