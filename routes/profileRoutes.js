@@ -5,6 +5,7 @@ import {
   addEducation, getEducation, updateEducation, deleteEducation,
   addProjectDetails, getProjectDetails, updateProjectDetails, deleteProjectDetails,
   addWorkExperience, getWorkExperience, updateWorkExperience, deleteWorkExperience,
+  getQualificationsById,
 } from '../controllers/profileController.js';
 
 const router = express.Router();
@@ -48,6 +49,9 @@ router.route('/workExperience/:id')
   .delete(protect, deleteWorkExperience);
 
 // Routes for Description
+
+router.route('/getQualification/:userId')
+  .get( getQualificationsById)
 
 
 export default router;

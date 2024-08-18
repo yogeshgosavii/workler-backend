@@ -60,6 +60,28 @@ const handleDelete = (Model) => async (req, res) => {
   }
 };
 
+// Function to get all qualifications for a specific user
+const getAllQualificationById = async (req, res) => {
+  try {
+    const {userId} = req.params;
+
+    console.log("userId",userId);
+    
+    
+    const skills = await Skill.find({ user: userId });
+    const education = await Education.find({ user: userId });
+    const workExperience = await WorkExperience.find({ user: userId });
+    const projectDetails = await ProjectDetails.find({ user: userId });
+    console.log("skills",skills);
+    
+    
+    res.json({ skills, education, workExperience, projectDetails });
+  } catch (error) {
+    console.error('Error fetching qualifications:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 // CRUD operations for Project Details
 export const addProjectDetails = asyncHandler(handleCreate(ProjectDetails));
 export const getProjectDetails = asyncHandler(handleGetAll(ProjectDetails));
@@ -84,4 +106,5 @@ export const getSkills = asyncHandler(handleGetAll(Skill));
 export const updateSkill = asyncHandler(handleUpdate(Skill));
 export const deleteSkill = asyncHandler(handleDelete(Skill));
 
-
+// Function to get all qualifications by user ID
+export const getQualificationsById = asyncHandler(getAllQualificationById);

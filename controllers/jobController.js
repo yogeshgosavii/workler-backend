@@ -110,13 +110,38 @@ const handleDelete = (Model) => async (req, res) => {
   }
 };
 
+const handleGetByIds = (Model) => async (req, res) => {
+  try {
+    const { ids } = req.body; // Assuming an array of job IDs is sent in req.body.ids
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).send('Expected a non-empty array of job IDs');
+    }
+
+    // Find all jobs by the array of IDs and ensure they belong to the authenticated user
+    const jobs = await Model.find({
+      _id: { $in: ids },
+    });
+
+    if (!jobs.length) {
+      return res.status(404).send('No jobs found');
+    }
+
+    res.json(jobs);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 // CRUD operations for Job
 export const addJob = asyncHandler(handleCreate(Job));
 export const addMultipleJob = asyncHandler(handleCreateMultiple(Job));
 export const getJobs = asyncHandler(handleGetAll(Job));
 export const getJobsById = asyncHandler(handleGetById(Job));
+export const getJobsByIds = asyncHandler(handleGetByIds(Job)); 
 export const updateJob = asyncHandler(handleUpdate(Job));
 export const deleteJob = asyncHandler(handleDelete(Job));
+
 
 // CRUD operations for Education
 

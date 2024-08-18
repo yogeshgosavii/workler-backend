@@ -210,3 +210,37 @@ export async function getUserDetails(req, res) {
         res.status(500).send('Error fetching user details');
     }
 }
+
+export async function getUserDetailsById(req, res) {
+    try {
+
+        const userId = req.params.userId
+        console.log("userId",userId);
+        
+        // Find user by decoded user ID from token, exclude password field
+        const user = await User.findById(userId).select("-password").populate({
+            path :"posts",
+            model :"Posts",
+        });
+        
+        if (!user) {
+            console.log(`User not found for details: ${userId}`);
+            return res.status(404).send('User not found');
+        }
+        
+        console.log(`User details fetched: ${user.email}`);
+        res.json(user);
+    } catch (error) {
+        console.error('Fetch user details error:', error.message, error.stack);
+        
+        if (error instanceof jwt.TokenExpiredError) {
+            return res.status(401).send('Token expired');
+        }
+        
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).send('Invalid token');
+        }
+        
+        res.status(500).send('Error fetching user details');
+    }
+}

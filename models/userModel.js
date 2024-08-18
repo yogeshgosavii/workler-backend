@@ -3,6 +3,7 @@ import PersonalDetails from './personalDetailsModel.js';
 import CompanyDetails from './companyModel.js';
 import Location from './locationModel.js'
 import imageSchema from './imageModel.js';
+import { Schema } from 'mongoose';
 
 
 const userSchema = new mongoose.Schema({
@@ -20,6 +21,7 @@ const userSchema = new mongoose.Schema({
   followers : {type :Number},
   following  : {type : Number},
   personal_details: { type: PersonalDetails },
+  posts: [{ type: Schema.Types.ObjectId, ref: "Posts" }],
   company_details: { type: CompanyDetails },
 });
 
