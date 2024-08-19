@@ -74,6 +74,28 @@ const handleGetById = (Model) => async (req, res) => {
   }
 };
 
+const handleGetByUserId = (Model) => async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // Find the document by ID
+    const data = await Model.find({user:id}) // You can populate any referenced fields if needed
+    console.log(data);
+    
+    if (!data) {
+      return res.status(404).send('Resource not found');
+    }
+
+    // Ensure the user is authorized to view this document
+  
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server Error');
+  }
+};
+
 
 const handleUpdate = (Model) => async (req, res) => {
   try {
@@ -138,6 +160,8 @@ export const addJob = asyncHandler(handleCreate(Job));
 export const addMultipleJob = asyncHandler(handleCreateMultiple(Job));
 export const getJobs = asyncHandler(handleGetAll(Job));
 export const getJobsById = asyncHandler(handleGetById(Job));
+export const getJobsByUserId = asyncHandler(handleGetByUserId(Job));
+
 export const getJobsByIds = asyncHandler(handleGetByIds(Job)); 
 export const updateJob = asyncHandler(handleUpdate(Job));
 export const deleteJob = asyncHandler(handleDelete(Job));
