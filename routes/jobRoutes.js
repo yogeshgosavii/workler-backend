@@ -15,6 +15,7 @@ router.route('/job')
   router.route('/get-multiple-job')
   .post(protect, getJobsByIds)
 
+  
 router.route('/job/:id')
   .get(protect,getJobsById)
   .put(protect, updateJob)
