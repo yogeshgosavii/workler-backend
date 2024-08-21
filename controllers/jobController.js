@@ -56,16 +56,14 @@ const handleGetById = (Model) => async (req, res) => {
     const { id } = req.params;
     
     // Find the document by ID
-    const data = await Model.findById(id).populate('user'); // You can populate any referenced fields if needed
+    const data = await Model.findById(id).populate('user').select("-password"); // You can populate any referenced fields if needed
 
     if (!data) {
       return res.status(404).send('Resource not found');
     }
 
     // Ensure the user is authorized to view this document
-    if (data.user.toString() !== req.user._id.toString()) {
-      return res.status(403).send('Unauthorized');
-    }
+    
 
     res.json(data);
   } catch (error) {
@@ -102,9 +100,7 @@ const handleUpdate = (Model) => async (req, res) => {
     const { id } = req.params;
     const data = await Model.findById(id);
 
-    if (!data || data.user.toString() !== req.user?._id.toString()) {
-      return res.status(401).json({ message: 'Not authorized' });
-    }
+   
 
     Object.assign(data, req.body);
     const updatedData = await data.save();

@@ -21,7 +21,7 @@ router.route('/job')
 
   
 router.route('/job/:id')
-  .get(protect,getJobsById)
+  .get(getJobsById)
   .put(protect, updateJob)
   .delete(protect, deleteJob);
 

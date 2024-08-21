@@ -23,7 +23,7 @@ const jobSchema = new Schema({
     job_url : {type:String},
     job_source : {type :String},
 
-    candidates_applied :{type : Number},
+    candidates_applied :[{ type: Schema.Types.ObjectId, ref: "User" }],
     candidate_limit : {type : Number}
 }, { timestamps: true });
 

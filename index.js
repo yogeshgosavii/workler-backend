@@ -9,6 +9,7 @@ import imageRoutes from "./routes/imageRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
+import approachRoutes from "./routes/approachRoutes.js"
 
 dotenv.config();
 
@@ -75,5 +76,8 @@ app.use("/api/search/", searchRoutes);
 app.use("/api/posts/", postRoutes);
 
 app.use("/api/location/", locationRoutes);
+
+app.use("/api/approach/", approachRoutes);
+
 
 export default app;

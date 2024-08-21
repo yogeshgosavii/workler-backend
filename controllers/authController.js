@@ -131,7 +131,7 @@ export async function updateUserDetails(req, res) {
         const { 
             username, email, location, description, personal_details, 
             company_details, githubLink, bio, linkedInLink, 
-            portfolioLink, tags 
+            portfolioLink, tags ,saved_jobs,saved_candidates
         } = req.body;
 
         // Update user fields if new values are provided, otherwise keep existing values
@@ -147,6 +147,10 @@ export async function updateUserDetails(req, res) {
         user.location = location !== undefined ? location : user.location;
         user.personal_details = personal_details !== undefined ? personal_details : user.personal_details;
         user.company_details = company_details !== undefined ? company_details : user.company_details;
+        user.saved_jobs = saved_jobs !== undefined ? saved_jobs : user.saved_jobs;
+        user.saved_candidates = saved_candidates !== undefined ? saved_candidates : user.saved_candidates;
+
+
 
         // Save the updated user back to the database
         const updatedUser = await user.save();
