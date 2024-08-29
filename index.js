@@ -10,6 +10,9 @@ import postRoutes from "./routes/postRoutes.js";
 import locationRoutes from "./routes/locationRoutes.js";
 import searchRoutes from "./routes/searchRoutes.js";
 import approachRoutes from "./routes/approachRoutes.js"
+import applicationRoutes from "./routes/applicationRoutes.js"
+import interviewRoute from "./routes/interviewRoute.js"
+
 
 dotenv.config();
 
@@ -71,11 +74,17 @@ app.use("/api/profile/", profileRoutes);
 
 app.use("/api/images/", imageRoutes);
 
+app.use("/api/application/", applicationRoutes);
+
+
 app.use("/api/search/", searchRoutes);
 
 app.use("/api/posts/", postRoutes);
 
 app.use("/api/location/", locationRoutes);
+
+app.use("/api/interview/", interviewRoute);
+
 
 app.use("/api/approach/", approachRoutes);
 

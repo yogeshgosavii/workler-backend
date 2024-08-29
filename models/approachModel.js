@@ -12,9 +12,13 @@ const approachSchema = new Schema({
     employeer :{
         type: Schema.Types.ObjectId,
         ref : "User"
+    },
+    status : {
+        type : String,
+        default : "approached"
     }
 
-});
+},{timestamp : true});
 
 const Approach = model("Approach", approachSchema);
 

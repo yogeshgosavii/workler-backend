@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
   followers : {type :Number},
   following  : {type : Number},
   saved_jobs : [{ type: Schema.Types.ObjectId, ref: "Job" }],
-  saved_candidates : [{ type: Schema.Types.ObjectId, ref: "User" }],
+  saved_profiles : [{ type: Schema.Types.ObjectId, ref: "User" }],
   personal_details: { type: PersonalDetails },
   posts: [{ type: Schema.Types.ObjectId, ref: "Posts" }],
   company_details: { type: CompanyDetails },
