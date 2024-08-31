@@ -3,7 +3,8 @@ import { imageMiddleware } from '../middleware/imageMiddleware.js';
 import {
 addPost,addJobPost,deletePost,getPosts,
   getUserPosts,
-updatePost} from '../controllers/postController.js';
+updatePost,
+getPostByUserId} from '../controllers/postController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import customUpload from '../middleware/uploadMiddleware.js';
 
@@ -19,8 +20,11 @@ router.route('/post')
   router.route('/post/job-post')
   .post(protect,addJobPost)
 
-router.route("all-posts")
-  .get(protect,getPosts)
+  router.route("/all-posts")
+  .get(getPosts)
+
+  router.route("/get-postby-userId/:userId")
+  .get(getPostByUserId)
 
   router.route('/post/:id')
   .put(protect, updatePost)

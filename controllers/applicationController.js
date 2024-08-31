@@ -154,7 +154,7 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
     // Fetch data
     const applicationDetails = await Model.find({
       employeer : userId
-    }) .populate({
+    }).populate({
         path: "job", // The field to populate
         model: "Job", // The model to use for populating
       })
@@ -166,11 +166,7 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
 
     console.log(applicationDetails);
     
-    // const skills = await Skill.find({user:approachDetails.user._id})
-    // const workExperience = await WorkExperience.find({user:approachDetails.user._id})
-    // const education = await Education.find({user:approachDetails.user._id})
-    // const projects = await Project.find({user:approachDetails.user._id})
-
+   
 
 
 

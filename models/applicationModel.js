@@ -9,6 +9,11 @@ const applicationSchema = new Schema({
         type : Schema.Types.ObjectId,
         ref : "User",
     },
+
+    employeer : {
+        type : Schema.Types.ObjectId,
+        ref : "User",
+    },
   
     status : {
         type : String,

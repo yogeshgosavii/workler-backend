@@ -43,7 +43,30 @@ const handleUserGetAll = (Model) => async (req, res) => {
       .populate({
         path: "user", // The field to populate
         model: "User", // The model to use for populating
-        select: "username",
+        select: "username personal_details location profileImage",
+      });
+
+    res.json(data);
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("Server Error");
+  }
+};
+
+const handleGetPostByUserId = (Model) => async (req, res) => {
+  const {userId} = req.params
+  try {
+    const data = await Model.find({ user: userId})
+      .populate({
+        path: "jobs", // The field to populate
+        model: "Job", // The model to use for populating
+        // Optional: Specify fields to include in the populated documents
+        select: "job_role company_name job_tags job_url",
+      })
+      .populate({
+        path: "user", // The field to populate
+        model: "User", // The model to use for populating
+        select: "username personal_details location profileImage",
       });
 
     res.json(data);
@@ -56,7 +79,17 @@ const handleUserGetAll = (Model) => async (req, res) => {
 // Get all documents (e.g., public posts)
 const handleGetAll = (Model) => async (req, res) => {
   try {
-    const data = await Model.find();
+    const data = await Model.find() .populate({
+      path: "jobs", // The field to populate
+      model: "Job", // The model to use for populating
+      // Optional: Specify fields to include in the populated documents
+      select: "job_role company_name job_tags job_url",
+    })
+    .populate({
+      path: "user", // The field to populate
+      model: "User", // The model to use for populating
+      select: "username personal_details location profileImage",
+    })
     res.json(data);
   } catch (error) {
     console.error("Error:", error);
@@ -137,3 +170,5 @@ export const getPosts = asyncHandler(handleGetAll(Post));
 export const getPostById = asyncHandler(handleGetById(Post)); // New export
 export const updatePost = asyncHandler(handleUpdate(Post));
 export const deletePost = asyncHandler(handleDelete(Post));
+export const getPostByUserId = asyncHandler(handleGetPostByUserId(Post));
+
