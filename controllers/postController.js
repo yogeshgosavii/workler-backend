@@ -3,12 +3,11 @@ import Post from "../models/postModel.js";
 
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
-  console.log(req.images);
+  console.log("imagesFinal",req.images);
   try {
     const data = new Model({
       ...req.body,
       images: req.images,
-      timestamp: new Date(),
       user: req.user._id,
     });
     await data.save();
@@ -79,7 +78,7 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
 // Get all documents (e.g., public posts)
 const handleGetAll = (Model) => async (req, res) => {
   try {
-    const data = await Model.find() .populate({
+    const data = await Model.find().populate({
       path: "jobs", // The field to populate
       model: "Job", // The model to use for populating
       // Optional: Specify fields to include in the populated documents
@@ -101,11 +100,19 @@ const handleGetAll = (Model) => async (req, res) => {
 const handleGetById = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await Model.findById(id);
+    const data = await Model.findById(id).populate({
+      path: "jobs", // The field to populate
+      model: "Job", // The model to use for populating
+      // Optional: Specify fields to include in the populated documents
+      select: "job_role company_name job_tags job_url",
+    })
+    .populate({
+      path: "user", // The field to populate
+      model: "User", // The model to use for populating
+      select: "username personal_details location profileImage",
+    });
 
-    if (!data || data.user.toString() !== req.user?._id.toString()) {
-      return res.status(401).json({ message: "Not authorized" });
-    }
+
 
     res.json(data);
   } catch (error) {

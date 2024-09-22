@@ -10,6 +10,11 @@ const applicationSchema = new Schema({
         ref : "User",
     },
 
+    resume : {
+        type : Schema.Types.ObjectId,
+        ref : "Resume",
+    },
+
     employeer : {
         type : Schema.Types.ObjectId,
         ref : "User",

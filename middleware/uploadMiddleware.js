@@ -6,7 +6,7 @@ const configureUpload = (maxCount) => {
 
   // Create multer upload instance with the specified fields
   const upload = multer({ storage }).fields([
-    { name: 'images', maxCount } 
+    { name: 'files', maxCount } 
   ]);
 
   return upload;

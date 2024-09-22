@@ -12,6 +12,10 @@ import searchRoutes from "./routes/searchRoutes.js";
 import approachRoutes from "./routes/approachRoutes.js"
 import applicationRoutes from "./routes/applicationRoutes.js"
 import interviewRoute from "./routes/interviewRoute.js"
+import resumeRoutes from "./routes/resumeRoute.js"
+import followRoutes from "./routes/followRoute.js"
+
+
 
 
 dotenv.config();
@@ -21,7 +25,7 @@ app.use(express.json());
 
 const corsOptions = {
   credentials: true,
-  origin: ["http://localhost:5173", "https://workler.netlify.app/"], // Whitelist the domains you want to allow
+  origin: ["http://localhost:5173", "https://workler.netlify.app/"], // Whitelist the domains to allow
 };
 
 app.use(cors(corsOptions));
@@ -87,6 +91,12 @@ app.use("/api/interview/", interviewRoute);
 
 
 app.use("/api/approach/", approachRoutes);
+
+app.use("/api/resume/", resumeRoutes);
+
+app.use("/api/follow/", followRoutes);
+
+
 
 
 export default app;

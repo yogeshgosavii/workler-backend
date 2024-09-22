@@ -4,7 +4,7 @@ import { signup, login,checkUsername, checkEmail ,updateUserDetails , getUserDet
 
 import { protect } from '../middleware/authMiddleware.js';
 import customUpload from '../middleware/uploadMiddleware.js';
-import imageMiddleware from '../middleware/imageMiddleware.js';
+import { imageMiddleware } from '../middleware/docMiddleware.js';
 
 const upload = customUpload(1)
 

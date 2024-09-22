@@ -117,6 +117,10 @@ const handleGetUserApplications = (Model) => async (req, res) => {
         model: "User", // The model to use for populating
         select: "username personal_details location profileImage",
       })
+      .populate({
+        path: "resume", // The field to populate
+        model: "Resume", // The model to use for populating
+      })
 
     console.log(applicationDetails);
     
@@ -162,6 +166,10 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
         path: "user", // The field to populate
         model: "User", // The model to use for populating
         select: "username personal_details location profileImage",
+      })
+      .populate({
+        path: "resume", // The field to populate
+        model: "Resume", // The model to use for populating
       })
 
     console.log(applicationDetails);

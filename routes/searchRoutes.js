@@ -7,7 +7,7 @@ import { protect } from '../middleware/authMiddleware.js';
 
 
 router.get('/search-by-username/:username',protect, searchByUsername);
-router.get('/search-job-by-keyword',protect, searchJobsByKeyWords);
+router.get('/search-job-by-keyword', searchJobsByKeyWords);
 
 
 

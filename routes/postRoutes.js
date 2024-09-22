@@ -1,10 +1,11 @@
 import express from 'express';
-import { imageMiddleware } from '../middleware/imageMiddleware.js';
+import { imageMiddleware } from '../middleware/docMiddleware.js';
 import {
 addPost,addJobPost,deletePost,getPosts,
   getUserPosts,
 updatePost,
-getPostByUserId} from '../controllers/postController.js';
+getPostByUserId,
+getPostById} from '../controllers/postController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import customUpload from '../middleware/uploadMiddleware.js';
 
@@ -27,6 +28,7 @@ router.route('/post')
   .get(getPostByUserId)
 
   router.route('/post/:id')
+  .get( getPostById)
   .put(protect, updatePost)
   .delete(protect, deletePost);
 

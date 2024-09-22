@@ -1,7 +1,7 @@
 import express from 'express';
 import { uploadImages } from '../controllers/imageController.js'; 
 import upload from '../middleware/uploadMiddleware.js'; // Adjust this path if needed
-import imageMiddleware from '../middleware/imageMiddleware.js';
+import { imageMiddleware } from '../middleware/docMiddleware.js';
 
 const router = express.Router();
 
