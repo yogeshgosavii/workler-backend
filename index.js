@@ -26,6 +26,8 @@ app.use(express.json());
 const corsOptions = {
   credentials: true,
   origin: ["http://localhost:5173", "https://workler.netlify.app/"], // Whitelist the domains to allow
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers you need
+
 };
 
 app.use(cors(corsOptions));

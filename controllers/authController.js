@@ -115,6 +115,51 @@ export async function checkUsername(req, res) {
     }
 }
 
+export async function updatePassword(req, res) {
+    const { currentPassword, newPassword } = req.body;
+    const username = req.user?.username;  // Assuming username is stored in req.user from authentication middleware
+    console.log(req.body);
+    
+    // Check for authorization
+    if (!username) {
+        return res.status(401).json({ error: "not authorized" });
+    }
+
+    // Check for missing passwords
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({ error: "Current and new password are required" });
+    }
+
+    try {
+        // Find the user by username
+        const user = await User.findOne({ username });
+
+        // Check if user exists
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Check if the current password is correct
+        const isPasswordMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ error: "Current password is incorrect" }); // Use status 401
+        }
+
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        // Update the user's password
+        user.password = hashedPassword;
+        await user.save();
+
+        return res.status(200).json({ message: "Password updated successfully" });
+    } catch (error) {
+        console.error("Error updating password:", error.message, error.stack);
+        return res.status(500).json({ error: "Error updating password" }); // Return error as JSON
+    }
+}
+
+
 export async function updateUserDetails(req, res) {
     console.log("Images:", req.images);
     console.log("Body:", req.body);
