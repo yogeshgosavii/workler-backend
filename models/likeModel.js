@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema ,model} from "mongoose";
 
 const likeSchema = new Schema({
   post: {
@@ -20,4 +20,6 @@ const likeSchema = new Schema({
 
 likeSchema.index({ post: 1, user: 1 }, { unique: true, sparse: true });
 
-export default likeSchema;
+const Like = model('Like', likeSchema);
+
+export { likeSchema, Like };
