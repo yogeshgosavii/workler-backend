@@ -1,8 +1,10 @@
 import asyncHandler from "express-async-handler";
 
 import Application from "../models/applicationModel.js";
+import notificationController from "./notificationController.js"; // Import the function
 
 // Create a new document
+
 const handleCreateApplication = (Model) => async (req, res) => {
   try {
     const data = new Model({
@@ -12,9 +14,25 @@ const handleCreateApplication = (Model) => async (req, res) => {
     console.log(data);
     
     await data.save();
+
+    // Create a notification for the employer when a new application is submitted
+    const employerId = data.employeer;  // Assuming `employeer` field in application is the employer's ID
+    const jobId = data.job;  // Assuming `job` field contains the job ID
+    
+    // Prepare notification data
+    const notificationData = {
+      userId: employerId,  // Send notification to the employer
+      related_to: data.user,  // Related user (applicant)
+      notificationType: "Application",  // Notification type
+      message: `You have received a new application for job ID: ${jobId}`,
+    };
+
+    // Call createNotification directly with a mock req object
+    await notificationController.createNotification({ body: notificationData }, res);
+
     res.status(201).json(data);
   } catch (error) {
-    console.error("Error:", error);
+    console.error("Error:", error);  // Log the complete error
     res.status(500).send("Server Error");
   }
 };
@@ -186,8 +204,12 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
   }
 };
 
+
+
+
 const handleUpdateApplicationStatus = (Model) => async (req, res) => {
   const { id, status } = req.body;
+  
   try {
     const application = await Model.findById(id);
 
@@ -198,9 +220,25 @@ const handleUpdateApplicationStatus = (Model) => async (req, res) => {
     application.status = status;
     const updatedApplication = await application.save();
 
+    // Create a notification for the applicant about the status update
+    const applicantId = application.user; // Assuming `user` field in application is the applicant's ID
+    const jobId = application.job;
+
+    // Prepare notification data
+    const notificationData = {
+      userId: applicantId,
+      related_to: application.employeer, // Related user (employer)
+      notificationType: "ApplicationStatus", // Notification type
+      message: `Your application status for job ID: ${jobId} has been updated to ${status}`,
+    };
+
+    // Use the notification controller's createNotification directly
+    await notificationController.createNotification({ body: notificationData }, res);
+
+    // Send the updated application as response
     res.json(updatedApplication);
   } catch (error) {
-    console.error("Update application status error:", error.message);
+    console.error("Update application status error:", error); // Log the complete error
     
     if (error.name === "TokenExpiredError" || error.name === "JsonWebTokenError") {
       return res.status(401).send("Invalid or expired token");
@@ -209,7 +247,6 @@ const handleUpdateApplicationStatus = (Model) => async (req, res) => {
     res.status(500).send("Error updating application status");
   }
 };
-
 
 
 // CRUD operations for Post

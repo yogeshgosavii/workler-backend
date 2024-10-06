@@ -1,5 +1,7 @@
 import asyncHandler from "express-async-handler";
 import Comment from "../models/commentModel.js";
+import Posts from "../models/postModel.js";
+import notificationController from "./notificationController.js";
 
 // Add a normal comment to a post
 const handleAddComment = asyncHandler(async (req, res) => {
@@ -11,6 +13,7 @@ const handleAddComment = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Content is required" });
   }
 
+  // Save the comment
   const comment = new Comment({
     user: userId,
     post: postId,
@@ -19,8 +22,38 @@ const handleAddComment = asyncHandler(async (req, res) => {
   });
 
   await comment.save();
+
+  // Fetch post details to find the post author
+  const post = await Posts.findById(postId).populate('user', 'username');
+  const postAuthorId = post.user._id;
+
+  // Avoid sending a notification if the user comments on their own post
+  if (postAuthorId.toString() !== userId) {
+    // Create a notification for the post author
+    const notificationData = {
+      userId: postAuthorId,  // Post author's ID
+      related_to: userId,    // Commenter’s user ID
+      notificationType: "comment",  // Notification type
+      message: `${req.user.username} commented on your post`,  // Notification message
+      contentId: postId,  // Link to the post
+    };
+
+    // Call createNotification and handle the response
+    const notificationResult = await notificationController.createNotification({ body: notificationData });
+
+    if (!notificationResult.success) {
+      // Log the error or send a warning response if needed
+      console.error(notificationResult.error);
+    }
+  }
+
+  // Send the response only once after everything is done
   res.status(201).json(comment);
 });
+
+
+
+
 
 // Add a reply to a comment
 const handleAddReply = asyncHandler(async (req, res) => {
@@ -33,7 +66,7 @@ const handleAddReply = asyncHandler(async (req, res) => {
   }
 
   // Check if the parent comment exists
-  const parentComment = await Comment.findById(commentId);
+  const parentComment = await Comment.findById(commentId).populate('user', 'username'); // Populate the user who made the parent comment
   if (!parentComment) {
     return res.status(404).json({ message: "Parent comment not found" });
   }
@@ -47,8 +80,31 @@ const handleAddReply = asyncHandler(async (req, res) => {
   });
 
   await replyComment.save();
+
+  // Avoid sending a notification if the user replies to their own comment
+  if (parentComment.user._id.toString() !== userId) {
+    // Create a notification for the parent comment author
+    const notificationData = {
+      userId: parentComment.user._id,  // Send notification to the parent comment author
+      related_to: userId,              // The user who made the reply
+      notificationType: "reply",  
+      contentId: parentComment._id,    // Notification type
+      message: `${req.user.username} replied to your comment`, // Customize the message
+    };
+
+    // Call createNotification and handle the response
+    const notificationResult = await notificationController.createNotification({ body: notificationData });
+
+    if (!notificationResult.success) {
+      console.error(notificationResult.error);  // Log the error
+      // You can send a response or handle the error as needed
+    }
+  }
+
+  // Send the response for the reply creation
   res.status(201).json(replyComment);
 });
+
 
 // Get all comments and replies for a post
 const handleGetComments = asyncHandler(async (req, res) => {

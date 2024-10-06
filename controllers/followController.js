@@ -1,7 +1,9 @@
 import asyncHandler from "express-async-handler";
 import Follow from "../models/followModel.js";
+import notificationController from "../controllers/notificationController.js"; // Ensure you have the correct path
+import User from "../models/userModel.js";
 
-// Create a new document
+// Create a new document and send notification
 const handleCreateFollow = (Model) => async (req, res) => {
   try {
     const data = new Model({
@@ -10,13 +12,48 @@ const handleCreateFollow = (Model) => async (req, res) => {
 
     console.log(data);
     
-    await data.save();
-    res.status(201).json(data);
+    // Save the follow relationship
+    const follow = await data.save();
+
+    // Create a notification for the user being followed
+    const followedUserId = follow.following; // ID of the followed user
+    const followerUserId = follow.user; // ID of the follower
+
+    // Fetch follower's details (assuming you have a User model)
+    const followerDetails = await User.findById(followerUserId, {
+      username: 1,
+      profileImage: 1,
+      // Add other fields you want to include
+    });
+
+    if (!followerDetails) {
+      return res.status(404).json({ message: "Follower not found" });
+    }
+
+    // Construct the notification data
+    const notificationData = {
+      userId: followedUserId,  // Send notification to the followed user
+      related_to: followerUserId,  // Related user (follower)
+      notificationType: "follow",  // Notification type
+      message: `${followerDetails.username} started following you`, // Customize your notification message
+      profileImage: followerDetails.profileImage // Optional: include profile image
+    };
+
+    // Call the createNotification function directly
+    await notificationController.createNotification({ body: notificationData }, res);
+
+    // Send the response for the follow creation
+    res.status(201).json(follow);
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("Server Error");
+    if (!res.headersSent) {
+      res.status(500).send("Server Error");
+    }
   }
 };
+
+
+
 
 // Get followers of a user
 const handleGetFollowers = (Model) => async (req, res) => {

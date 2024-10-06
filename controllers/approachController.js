@@ -1,5 +1,6 @@
 import asyncHandler from "express-async-handler";
 import Approach from "../models/approachModel.js";
+import notificationController from "./notificationController.js";
 
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
@@ -7,13 +8,27 @@ const handleCreate = (Model) => async (req, res) => {
     const data = new Model({
       ...req.body,
     });
+    
     await data.save();
+
+    // Notify the user that they have been approached
+    const notificationData = {
+      userId: data.user,  // The user being approached
+      related_to: data.employeer,  // The employer who approached the user
+      notificationType: "approach",  // Notification type
+      contentId:data.job._id,
+      message: `You have been approached by ${req.user.username} for a job `,  // Custom message
+    };
+
+    const notificationResult = await notificationController.createNotification({ body: notificationData });
+
     res.status(201).json(data);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Server Error");
   }
 };
+
 
 const handleCheckApproached = (Model) => async (req, res) => {
   try {
@@ -114,15 +129,24 @@ const handleGetApproaches = (Model) => async (req, res) => {
 const handleUpdateApproachStatus = async (req, res) => {
   const { id, status } = req.body;
   try {
-    const approach = await Approach.findById(id);
+    const approach = await Approach.findById(id).populate('user', 'username').populate('employeer', 'username');
 
     if (!approach) {
       return res.status(404).send("Approach not found");
     }
 
     approach.status = status;
-
     const updatedApproach = await approach.save();
+
+    // Notify the employer about the status change
+    const notificationData = {
+      userId: approach.employeer,  // The employer being notified
+      related_to: approach.user,   // The user who changed the status
+      notificationType: "ApproachStatus",  // Notification type
+      message: `${approach.user.username} has updated the approach status to ${status}`,  // Custom message
+    };
+
+    const notificationResult = await notificationController.createNotification({ body: notificationData });
 
     if (!res.headersSent) {
       res.json(updatedApproach);
@@ -130,23 +154,12 @@ const handleUpdateApproachStatus = async (req, res) => {
   } catch (error) {
     console.error("Update approach details error:", error.message);
 
-    if (error instanceof jwt.TokenExpiredError) {
-      if (!res.headersSent) {
-        return res.status(401).send("Token expired");
-      }
-    }
-
-    if (error.name === "JsonWebTokenError") {
-      if (!res.headersSent) {
-        return res.status(401).send("Invalid token");
-      }
-    }
-
     if (!res.headersSent) {
       res.status(500).send("Error updating approach details");
     }
   }
 };
+
 
 // CRUD operations for Approach
 export const createApproach = asyncHandler(handleCreate(Approach));

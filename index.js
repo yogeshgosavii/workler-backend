@@ -15,8 +15,7 @@ import interviewRoute from "./routes/interviewRoute.js"
 import resumeRoutes from "./routes/resumeRoute.js"
 import followRoutes from "./routes/followRoute.js"
 import savedRoutes from "./routes/savedRoutes.js"
-
-
+import notificationRoutes from "./routes/notificationRoutes.js"
 
 
 
@@ -101,6 +100,9 @@ app.use("/api/resume/", resumeRoutes);
 app.use("/api/follow/", followRoutes);
 
 app.use("/api/saved", savedRoutes);
+
+app.use("/api/notification", notificationRoutes);
+
 
 
 
