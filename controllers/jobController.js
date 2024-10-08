@@ -1,5 +1,6 @@
 import asyncHandler from 'express-async-handler';
 import {Job} from '../models/jobModel.js';
+import { getExternalJobs } from '../controllers/externalJobsController.js'; // Import your external jobs controller
 
 
 // Helper function to handle async/await and error responses
@@ -41,15 +42,28 @@ const handleCreateMultiple = (Model) => async (req, res) => {
 };
 
 
+
+
 const handleGetAll = (Model) => async (req, res) => {
   try {
-    const data = await Model.find({ user: req.user?._id });
-    res.json(data);
+    // Fetch internal jobs from the database
+    const internalJobs = await Model.find({ user: req.user?._id, isInternal: true });
+
+    // Fetch external jobs using the external jobs controller
+    const externalJobs = await getExternalJobs(req.user._id); // Call the function that fetches external jobs
+
+    // Combine the results into a single array
+    const allJobs = [...internalJobs, ...externalJobs];
+
+    res.json(allJobs);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Server Error');
   }
 };
+
+// Export the function as usual
+
 
 const handleGetById = (Model) => async (req, res) => {
   try {
