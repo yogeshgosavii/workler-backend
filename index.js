@@ -135,24 +135,6 @@ app.get('/proxy', async (req, res) => {
 
 
 
-const imageUrl = 'https://remotive.com/job/1937582/logo';
-const proxyUrl = 'http://localhost:5002/proxy?url=';
-
-fetch(proxyUrl + encodeURIComponent(imageUrl))
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.blob(); // Convert response to a Blob
-    })
-    .then(imageBlob => {
-        const imageObjectURL = URL.createObjectURL(imageBlob); // Create a local URL for the blob
-        const imgElement = document.createElement('img');
-        imgElement.src = imageObjectURL; // Set the src of the image
-        document.body.appendChild(imgElement); // Append the image to the document body
-    })
-    .catch(error => console.error('Error fetching image:', error));
-
 
 
 
