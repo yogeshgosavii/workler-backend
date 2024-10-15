@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.route('/job')
   .post(protect, addJob)
-  .get(protect, getJobs);
+  .get( getJobs);
 
   router.route('/multiple-job')
   .post(protect, addMultipleJob)

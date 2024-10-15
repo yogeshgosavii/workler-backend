@@ -47,13 +47,15 @@ const handleCreateMultiple = (Model) => async (req, res) => {
 const handleGetAll = (Model) => async (req, res) => {
   try {
     // Fetch internal jobs from the database
-    const internalJobs = await Model.find({ user: req.user?._id, isInternal: true });
+    const internalJobs = await Job.find();
 
     // Fetch external jobs using the external jobs controller
-    const externalJobs = await getExternalJobs(req.user._id); // Call the function that fetches external jobs
+    const externalJobs = await getExternalJobs(); // Call the function that fetches external jobs
 
     // Combine the results into a single array
     const allJobs = [...internalJobs, ...externalJobs];
+    console.log("jobs",internalJobs);
+    
 
     res.json(allJobs);
   } catch (error) {
