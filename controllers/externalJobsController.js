@@ -4,12 +4,28 @@ import axios from 'axios';
 import mongoose from 'mongoose';
 
 // Function to fetch jobs from Remotive
-const fetchJobsFromRemotive = async (query) => {
+const fetchJobsFromRemotive = async () => {
   try {
-    const response = await axios.get('https://remotive.com/api/remote-jobs', {
-      params: query, // Use the query parameters from the request
-    });
+    const response = await axios.get('https://remotive.com/api/remote-jobs',);
     return response.data.jobs || []; // Return jobs or an empty array
+  } catch (error) {
+    console.error("Error fetching jobs from Remotive:", error.message);
+    throw new Error('Failed to fetch jobs from Remotive');
+  }
+};
+export const fetchJobsFromRemotiveByQuery = async (query) => {
+  try {
+    console.log(query);
+    
+    const encodedQuery = encodeURIComponent(query);
+    console.log(encodedQuery);
+    
+    const response = await axios.get('https://remotive.com/api/remote-jobs?search='+encodedQuery,);
+    
+    const transFormedJobs = response.data.jobs.map(job=>transformJobData(job,"Remotive"))
+    // console.log("search",transFormedJobs);
+
+    return transFormedJobs; // Return jobs or an empty array
   } catch (error) {
     console.error("Error fetching jobs from Remotive:", error.message);
     throw new Error('Failed to fetch jobs from Remotive');

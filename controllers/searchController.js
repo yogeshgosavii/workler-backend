@@ -1,5 +1,6 @@
 import { Job } from '../models/jobModel.js';
 import User from '../models/userModel.js';
+import { fetchJobsFromRemotiveByQuery } from './externalJobsController.js';
 
 
 export async function searchByUsername(req, res) {
@@ -58,7 +59,7 @@ export async function searchJobsByKeyWords(req, res) {
         };
 
         // Query to find jobs using the constructed query
-        const jobs = await Job.find(finalQuery).populate({
+        let jobs = await Job.find(finalQuery).populate({
             path: "user", // The field to populate
             model: "User", // The model to use for populating
             select: "username company_details location profileImage",
@@ -66,6 +67,10 @@ export async function searchJobsByKeyWords(req, res) {
 
         console.log(jobs);
 
+        const remotiveJobs = await fetchJobsFromRemotiveByQuery(keywords)
+        
+
+        jobs = [...jobs,...remotiveJobs]
         if (jobs.length === 0) {
             return res.status(404).json({ message: 'No jobs found matching the keyword.' });
         }
