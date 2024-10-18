@@ -1,6 +1,7 @@
 // controllers/externalJobController.js
 import asyncHandler from 'express-async-handler';
 import axios from 'axios';
+import mongoose from 'mongoose';
 
 // Function to fetch jobs from Remotive
 const fetchJobsFromRemotive = async (query) => {
@@ -12,6 +13,40 @@ const fetchJobsFromRemotive = async (query) => {
   } catch (error) {
     console.error("Error fetching jobs from Remotive:", error.message);
     throw new Error('Failed to fetch jobs from Remotive');
+  }
+};
+const jobCache = {};
+
+export const fetchJobDetailsFromRemotiveById = async (jobId) => {
+  // Check if job details are already in cache
+  if (jobCache[jobId]) {
+    console.log('Fetching job details from cache:', jobId);
+    return jobCache[jobId]; // Return from cache
+  }
+
+  try {
+    // Fetch all jobs and find the specific job ID (if direct fetching isn't available)
+    const response = await axios.get('https://remotive.com/api/remote-jobs');
+    const jobs = response.data.jobs || [];
+    console.log("jobs",jobs[0]);
+    console.log("jobId",jobId);
+    
+    // Filter for the specific job ID
+    const job = jobs.filter(job => job.id == jobId);
+    console.log("job",job);
+    
+
+    // Transform the job data if found
+    if (job.length != 0) {
+      const transformedData = transformJobData(job[0], 'Remotive');
+      jobCache[jobId] = transformedData; // Store in cache
+      return transformedData; // Return the job details
+    }
+
+    return null; // Return null if the job is not found
+  } catch (error) {
+    console.error("Error fetching job details:", error.message);
+    throw new Error('Failed to fetch job details');
   }
 };
 

@@ -32,6 +32,7 @@ const compressImage = async (imageBuffer) => {
 // Middleware for handling image uploads with compression
 export const imageMiddleware = async (req, res, next) => {
   try {
+    console.log(req)
     if (!req.files || !req.files.files || req.files.files.length === 0) {
       return next();
     }
