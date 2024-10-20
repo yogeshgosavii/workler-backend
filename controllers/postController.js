@@ -43,6 +43,11 @@ const handleUserGetAll = (Model) => async (req, res) => {
         path: "user", // The field to populate
         model: "User", // The model to use for populating
         select: "username personal_details location profileImage",
+      })
+      .populate({
+        path: "mentions", // The field to populate
+        model: "User", // The model to use for populating
+        select: "username personal_details location profileImage",
       });
 
     res.json(data);
@@ -65,7 +70,12 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
       .populate({
         path: "user", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details location profileImage",
+        select: "username personal_details company_details location profileImage",
+      })
+      .populate({
+        path: "mentions", // The field to populate
+        model: "User", // The model to use for populating
+        select: "username personal_details company_details location profileImage",
       });
 
     res.json(data);
@@ -87,8 +97,13 @@ const handleGetAll = (Model) => async (req, res) => {
     .populate({
       path: "user", // The field to populate
       model: "User", // The model to use for populating
-      select: "username personal_details location profileImage",
+      select: "username personal_details company_details location profileImage",
     })
+    .populate({
+      path: "mentions", // The field to populate
+      model: "User", // The model to use for populating
+      select: "username personal_details company_details location profileImage",
+    });
     res.json(data);
   } catch (error) {
     console.error("Error:", error);
@@ -109,7 +124,12 @@ const handleGetById = (Model) => async (req, res) => {
     .populate({
       path: "user", // The field to populate
       model: "User", // The model to use for populating
-      select: "username personal_details location profileImage",
+      select: "username personal_details company_details  location profileImage",
+    })
+    .populate({
+      path: "mentions", // The field to populate
+      model: "User", // The model to use for populating
+      select: "username personal_details company_details location profileImage",
     });
 
 
@@ -132,6 +152,7 @@ const handleUpdate = (Model) => async (req, res) => {
     images,
     content,
     post_type,
+    mentions
   } = req.body;
   try {
     const { id } = req.params;
@@ -144,6 +165,7 @@ const handleUpdate = (Model) => async (req, res) => {
 
     data.likes = likes == [] ? null : likes;
     data.comments = comments == [] ? null : comments;
+    data.mentions = mentions
     const updatedData = await data.save();
     res.json(updatedData);
   } catch (error) {

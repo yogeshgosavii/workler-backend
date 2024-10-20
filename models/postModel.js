@@ -22,6 +22,7 @@ const postSchema = new Schema(
     images: imageSchema,
     content: String,
     post_type: String,
+    mentions :[{ type: Schema.Types.ObjectId, ref: "User" }]
   },
   {
     timestamps: true, 
