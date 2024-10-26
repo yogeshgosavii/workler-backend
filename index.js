@@ -16,6 +16,7 @@ import resumeRoutes from "./routes/resumeRoute.js";
 import followRoutes from "./routes/followRoute.js";
 import savedRoutes from "./routes/savedRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
+import preferenceRoutes from "./routes/preferenceRoutes.js"
 
 dotenv.config();
 
@@ -85,5 +86,7 @@ app.use("/api/resume/", resumeRoutes);
 app.use("/api/follow/", followRoutes);
 app.use("/api/saved", savedRoutes);
 app.use("/api/notification", notificationRoutes);
+app.use("/api/preference", preferenceRoutes);
+
 
 export default app;

@@ -55,6 +55,8 @@ export const fetchJobDetailsFromRemotiveById = async (jobId) => {
     // Transform the job data if found
     if (job.length != 0) {
       const transformedData = transformJobData(job[0], 'Remotive');
+      console.log(transformedData);
+      
       jobCache[jobId] = transformedData; // Store in cache
       return transformedData; // Return the job details
     }
@@ -113,9 +115,17 @@ const fetchJobsFromReed = async (query) => {
 
 // Transform API job data into the unified schema format
 const transformJobData = (apiJob, source) => {
-  const salaryRange = apiJob.salary ? apiJob.salary.match(/\$([0-9,]+) - \$([0-9,]+)/) : null;
-  const min_salary = salaryRange ? parseInt(salaryRange[1].replace(/,/g, '')) : null;
-  const max_salary = salaryRange ? parseInt(salaryRange[2].replace(/,/g, '')) : null;
+  // console.log(apiJob);
+  const salaryRange = apiJob.salary ? apiJob.salary.match(/([₹$€£¥]?)\s?([0-9,]+(?:\.[0-9]{1,2})?)\s?-\s?([₹$€£¥]?)\s?([0-9,]+(?:\.[0-9]{1,2})?)/) : null;
+  const min_salary = salaryRange ? parseFloat(salaryRange[2].replace(/,/g, '')) : null;
+  const max_salary = salaryRange ? parseFloat(salaryRange[4].replace(/,/g, '')) : null;
+  
+  // Extract currency type if available, defaulting to 'USD'
+  const currency_type = salaryRange ? (salaryRange[1] || salaryRange[3] || 'USD') : null;
+  
+
+  // Determine salary type, default to 'per annum' if not provided
+  const salary_type = apiJob.salary_type || (apiJob.salary ?(apiJob.salary.split("per")[1]) : null);
 
   const location = {
     country: apiJob.candidate_required_location || apiJob.location || null,
@@ -127,6 +137,8 @@ const transformJobData = (apiJob, source) => {
     job_role: apiJob.title || '',
     min_salary,
     max_salary,
+    currency_type,
+    salary_type,
     source,
     description: apiJob.description || '',
     company_name: apiJob.company_name || apiJob.company || '',
@@ -144,6 +156,7 @@ const transformJobData = (apiJob, source) => {
     candidate_limit: null,
   };
 };
+
 
 // Function to fetch and aggregate jobs from multiple sources
 export const fetchAllJobs = async (query) => {

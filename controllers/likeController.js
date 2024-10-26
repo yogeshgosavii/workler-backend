@@ -1,11 +1,14 @@
 import asyncHandler from "express-async-handler";
-import {Like} from "../models/likeModel.js";
+import { Like } from "../models/likeModel.js";
+import { Notification } from "../models/notificationModule.js"; // Assuming you have a Notification model
+import notificationController from "../controllers/notificationController.js"; // Assuming createNotification is defined here
+import Posts from "../models/postModel.js";
 
-// Add a like to a post
+// Add a like to a post and create a notification
 const handleLikePost = (Model) => async (req, res) => {
   try {
     const { postId } = req.params;
-    const userId = req.user.id; // Assume user is authenticated and `req.user.id` exists
+    const userId = req.user._id; // Assume user is authenticated and `req.user.id` exists
 
     // Check if the user already liked the post
     const existingLike = await Model.findOne({ user: userId, post: postId });
@@ -16,6 +19,29 @@ const handleLikePost = (Model) => async (req, res) => {
     // Create a new like
     const like = new Model({ user: userId, post: postId });
     await like.save();
+    const post = await Posts.findById(postId).populate('user', 'username');
+    const postAuthorId = post.user._id;
+
+    // Create a notification for the post owner
+    if (postAuthorId.toString() !== userId) {
+      // Create a notification for the post author
+      const notificationData = {
+        userId: postAuthorId,  // Post author's ID
+        related_to: userId,    // Commenter’s user ID
+        notificationType: "like",  // Notification type
+        message: `${req.user.username} liked your post`,  // Notification message
+        contentId: postId,  // Link to the post
+      };
+  
+      // Call createNotification and handle the response
+      const notificationResult = await notificationController.createNotification({ body: notificationData });
+  
+      if (!notificationResult.success) {
+        // Log the error or send a warning response if needed
+        console.error(notificationResult.error);
+      }
+    }
+
     res.status(201).json(like);
   } catch (error) {
     console.error("Error:", error);
@@ -23,11 +49,11 @@ const handleLikePost = (Model) => async (req, res) => {
   }
 };
 
-// Remove a like from a post
+// Remove a like from a post and delete the related notification
 const handleUnlikePost = (Model) => async (req, res) => {
   try {
     const { postId } = req.params;
-    const userId = req.user.id;
+    const userId = req.user._id;
 
     // Check if the like exists
     const like = await Model.findOne({ user: userId, post: postId });
@@ -37,7 +63,15 @@ const handleUnlikePost = (Model) => async (req, res) => {
 
     // Remove the like
     await like.deleteOne();
-    res.json({ message: "Like removed successfully" });
+
+    // Remove the notification related to this like
+    await Notification.findOneAndDelete({
+      relatedTo: userId,
+      notificationType: "like",
+      contentId: postId,
+    });
+
+    res.json({ message: "Like removed and notification deleted successfully" });
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Server Error");

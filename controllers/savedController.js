@@ -18,9 +18,10 @@ export async function createSaved(req, res) {
 export async function checkSaved(req, res) {
   try {
     const { saved_content } = req.body; // Assuming saved_content is sent in the request body
+
     const savedItem = await Saved.findOne({
       user: req.user._id,
-      saved_content,
+      // saved_content,
     });
 
     res.status(200).json({ exists: !!savedItem });
@@ -79,6 +80,15 @@ export async function getSpecificSaved(req, res) {
         // Nested population
         path: "job", // Field in the Job model that references another document (example: company)
         model: "Job", // Model to populate in the nested field (example: Company)
+        strictPopulate: false, // Allows to populate even if the path is not in schema
+
+      },
+      populate: {
+        // Nested population
+        path: "user", // Field in the Job model that references another document (example: company)
+        model: "User", // Model to populate in the nested field (example: Company)
+        select: "username personal_details company_details location profileImage",
+
         strictPopulate: false, // Allows to populate even if the path is not in schema
 
       },

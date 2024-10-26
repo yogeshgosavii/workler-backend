@@ -42,12 +42,12 @@ const handleUserGetAll = (Model) => async (req, res) => {
       .populate({
         path: "user", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details location profileImage",
+        select: "username personal_details company_details location profileImage",
       })
       .populate({
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details location profileImage",
+        select: "username personal_details company_details location profileImage",
       });
 
     res.json(data);
