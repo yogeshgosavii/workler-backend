@@ -6,7 +6,7 @@ const notificationSchema = new Schema({
   related_to: { type: Schema.Types.ObjectId, ref: 'User', required: true },  // User or event that triggered the notification
   notificationType: {
     type: String,
-    enum: ['application', 'message', 'comment','reply', 'like','follow','approach', 'other'],  // Predefined notification types
+    enum: ['application','interview', 'message', 'comment','reply', 'like','follow','approach', 'other'],  // Predefined notification types
     required: true,
   },
   message: { type: String, required: true },  // Notification content

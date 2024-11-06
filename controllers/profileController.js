@@ -72,7 +72,7 @@ const getAllQualificationById = async (req, res) => {
     const education = await Education.find({ user: userId });
     const workExperience = await WorkExperience.find({ user: userId });
     const projectDetails = await ProjectDetails.find({ user: userId });
-    console.log("skills",skills);
+    console.log("skills",education);
     
     
     res.json({ skills, education, workExperience, projectDetails });

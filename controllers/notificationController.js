@@ -70,12 +70,14 @@ const getUserNotifications = async (req, res) => {
           as: 'commentDetails',
         },
       },
+      
       {
         $addFields: {
           populatedContent: {
             $switch: {
               branches: [
                 { case: { $eq: ['$notificationType', 'comment'] }, then: '$postDetails' },
+                { case: { $eq: ['$notificationType', 'like'] }, then: '$postDetails' },
                 { case: { $eq: ['$notificationType', 'follow'] }, then: '$userDetails' },
                 { case: { $eq: ['$notificationType', 'approach'] }, then: '$jobDetails' },
                 { case: { $eq: ['$notificationType', 'reply'] }, then: '$commentDetails' },
