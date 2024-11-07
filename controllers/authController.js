@@ -175,7 +175,7 @@ export async function requestPasswordReset(req, res) {
     res.status(200).json({ message: "Password reset link sent successfully" });
   } catch (error) {
     console.error("Error sending password reset email:", error.message);
-    res.status(500).json({ error: "Error sending password reset email" });
+    res.status(500).json({ error: "Something went wrong. Please try again later." });
   }
 }
 
