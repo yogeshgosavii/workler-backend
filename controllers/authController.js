@@ -195,7 +195,7 @@ export async function validateResetToken(req, res) {
     // Find the user with this token and check if it is not more than an hour old
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
-    //   resetPasswordExpire: { $gte: oneHourAgo, $lte: Date.now() }, // Token is within the last hour
+      resetPasswordExpire: { $gte: oneHourAgo, $lte: Date.now() }, // Token is within the last hour
     });
 
     if (!user) {
