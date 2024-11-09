@@ -22,8 +22,10 @@ const handleLikePost = (Model) => async (req, res) => {
     const post = await Posts.findById(postId).populate('user', 'username');
     const postAuthorId = post.user._id;
 
+    console.log(postAuthorId,userId);
+    
     // Create a notification for the post owner
-    if (postAuthorId.toString() !== userId) {
+    if (!postAuthorId.equals(userId)) {
       // Create a notification for the post author
       const notificationData = {
         userId: postAuthorId,  // Post author's ID
@@ -56,7 +58,9 @@ const handleUnlikePost = (Model) => async (req, res) => {
     const userId = req.user._id;
 
     // Check if the like exists
-    const like = await Model.findOne({ user: userId, post: postId });
+    const like = await Model.findOne({ user: userId, post
+      : postId });
+    console.log(like)
     if (!like) {
       return res.status(404).json({ message: "Like not found" });
     }
@@ -66,7 +70,7 @@ const handleUnlikePost = (Model) => async (req, res) => {
 
     // Remove the notification related to this like
     await Notification.findOneAndDelete({
-      relatedTo: userId,
+      related_to: userId,
       notificationType: "like",
       contentId: postId,
     });

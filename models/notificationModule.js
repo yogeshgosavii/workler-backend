@@ -12,6 +12,7 @@ const notificationSchema = new Schema({
   message: { type: String, required: true },  // Notification content
   read: { type: Boolean, default: false },    // If notification has been read or not
   contentId: { type: Schema.Types.ObjectId},  // User or event that triggered the notification
+  actionId:{type:Schema.Types.ObjectId},
 }, { timestamps: true });
 
 const Notification = model('Notification', notificationSchema);

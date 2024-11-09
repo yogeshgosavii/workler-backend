@@ -2,6 +2,7 @@ import asyncHandler from "express-async-handler";
 import Comment from "../models/commentModel.js";
 import Posts from "../models/postModel.js";
 import notificationController from "./notificationController.js";
+import { Notification } from "../models/notificationModule.js";
 
 // Add a normal comment to a post
 const handleAddComment = asyncHandler(async (req, res) => {
@@ -28,12 +29,13 @@ const handleAddComment = asyncHandler(async (req, res) => {
   const postAuthorId = post.user._id;
 
   // Avoid sending a notification if the user comments on their own post
-  if (postAuthorId.toString() !== userId) {
+  if (!postAuthorId.equals(userId)) {
     // Create a notification for the post author
     const notificationData = {
       userId: postAuthorId,  // Post author's ID
       related_to: userId,    // Commenter’s user ID
       notificationType: "comment",  // Notification type
+      actionId:comment._id,
       message: `${req.user.username} commented on your post`,  // Notification message
       contentId: postId,  // Link to the post
     };
@@ -88,6 +90,7 @@ const handleAddReply = asyncHandler(async (req, res) => {
       userId: parentComment.user._id,  // Send notification to the parent comment author
       related_to: userId,              // The user who made the reply
       notificationType: "reply",  
+      actionId:replyComment._id,
       contentId: parentComment._id,    // Notification type
       message: `${req.user.username} replied to your comment`, // Customize the message
     };
@@ -156,6 +159,12 @@ const handleDeleteComment = asyncHandler(async (req, res) => {
   await Comment.deleteMany({
     $or: [{ _id: commentId }, { parentComment: commentId }],
   });
+
+  await Notification.findOneAndDelete({
+    actionId:commentId,
+    notificationType: "comment",
+  });
+
 
   res.json({ message: "Comment and replies deleted successfully" });
 });
