@@ -2,6 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import fetch from "node-fetch"; // Install this if not already in the project
 
 import authRoutes from "./routes/authRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
@@ -33,14 +34,7 @@ const corsOptions = {
   preflightContinue: false,
   optionsSuccessStatus: 204,
 };
-
 app.use(cors(corsOptions));
-
-// Configure session middleware
-
-// Google OAuth Routes
-
-
 
 // MongoDB connection
 const PORT = process.env.PORT || 5000;
@@ -69,6 +63,11 @@ mongoose.connect(MONGO_URI, {
 app.get("/", (req, res) => {
   res.send("Prod running with MongoDB connection");
 });
+
+// Proxy route for image fetching
+
+
+
 
 // Use routes
 app.use("/api/auth/", authRoutes);
