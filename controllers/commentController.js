@@ -3,6 +3,7 @@ import Comment from "../models/commentModel.js";
 import Posts from "../models/postModel.js";
 import notificationController from "./notificationController.js";
 import { Notification } from "../models/notificationModule.js";
+import mongoose from "mongoose";
 
 // Add a normal comment to a post
 const handleAddComment = asyncHandler(async (req, res) => {
@@ -67,46 +68,59 @@ const handleAddReply = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Reply content is required" });
   }
 
+  // Validate commentId to ensure it's a valid ObjectId
+  if (!commentId) {
+    console.error("Invalid commentId:", commentId);
+    return res.status(400).json({ message: "Invalid comment ID." });
+  }
+
   // Check if the parent comment exists
-  const parentComment = await Comment.findById(commentId).populate('user', 'username'); // Populate the user who made the parent comment
+  const parentComment = await Comment.findById(commentId).populate('user', 'username');
   if (!parentComment) {
     return res.status(404).json({ message: "Parent comment not found" });
   }
 
+  console.log("parent",parentComment)
+
   // Create a reply comment linked to the parent comment
-  const replyComment = new Comment({
+  let replyComment = new Comment({
     user: userId,
-    post: parentComment.post, // Inherit the post from the parent comment
+    post: parentComment.post,
     content,
-    parentComment: parentComment._id, // This is a reply to the parent comment
+    parentComment: parentComment._id,
   });
 
   await replyComment.save();
+  
+
+
+
+  console.log("Reply Comment ID:", replyComment._id); // Check if ID is generated correctly
 
   // Avoid sending a notification if the user replies to their own comment
-  if (parentComment.user._id.toString() !== userId) {
-    // Create a notification for the parent comment author
-    const notificationData = {
-      userId: parentComment.user._id,  // Send notification to the parent comment author
-      related_to: userId,              // The user who made the reply
-      notificationType: "reply",  
-      actionId:replyComment._id,
-      contentId: parentComment._id,    // Notification type
-      message: `${req.user.username} replied to your comment`, // Customize the message
-    };
+if (parentComment.user._id.toString() !== userId) {
+  const notificationData = {
+    userId: parentComment.user._id,        // User receiving the notification (parent comment author)
+    related_to: userId,                    // The user who made the reply
+    notificationType: "reply",             // Notification type
+    actionId: replyComment._id, // Example hardcoded ObjectId
+    contentId: parentComment._id,          // Parent comment's ID
+    message: `${req.user.username} replied to your comment`, // Custom message
+  };
 
-    // Call createNotification and handle the response
-    const notificationResult = await notificationController.createNotification({ body: notificationData });
-
-    if (!notificationResult.success) {
-      console.error(notificationResult.error);  // Log the error
-      // You can send a response or handle the error as needed
-    }
+  // Create the notification using the notification controller
+  const notificationResult = await notificationController.createNotification({ body: notificationData });
+  
+  if (!notificationResult.success) {
+    console.error("Notification creation error:", notificationResult.error);
   }
+}
 
-  // Send the response for the reply creation
+
   res.status(201).json(replyComment);
 });
+
+
 
 
 // Get all comments and replies for a post
@@ -162,7 +176,6 @@ const handleDeleteComment = asyncHandler(async (req, res) => {
 
   await Notification.findOneAndDelete({
     actionId:commentId,
-    notificationType: "comment",
   });
 
 

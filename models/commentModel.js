@@ -18,7 +18,6 @@ const commentSchema = new mongoose.Schema({
   parentComment: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
-    default: null, // If null, it's a normal comment. If it references another comment, it's a reply.
   },
   createdAt: {
     type: Date,

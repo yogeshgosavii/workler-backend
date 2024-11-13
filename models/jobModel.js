@@ -19,10 +19,10 @@ const jobSchema = new Schema({
     min_experience : {type: Number},
     max_experience : {type : Number},
     job_tags : {type : [String]},
+    salary_type:{type:String},
     company_logo : {type : String},
     job_url : {type:String},
     job_source : {type :String},
-
     candidates_applied :[{ type: Schema.Types.ObjectId, ref: "User" }],
     candidate_limit : {type : Number}
 }, { timestamps: true });

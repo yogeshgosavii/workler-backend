@@ -4,14 +4,15 @@ import mongoose from 'mongoose';
 // Create a new notification
 const createNotification = async (req, res) => {
   try {
-    const { userId, related_to, notificationType, message, contentId } = req.body;
+    const { userId, related_to, notificationType,actionId, message, contentId } = req.body;
 
     const newNotification = new Notification({
       userId,
       related_to,
       notificationType,
       message,
-      contentId
+      contentId,
+      actionId
     });
 
     const savedNotification = await newNotification.save();
