@@ -120,12 +120,12 @@ const handleGetFollowing = (Model) => async (req, res) => {
     .populate({
       path: "user", // The field to populate
       model: "User", // The model to use for populating
-      select: "username personal_details location profileImage",
+      select: "username company_details  personal_details location profileImage",
     })
     .populate({
-      path: "follower", // The field to populate
+      path: "following", // The field to populate
       model: "User", // The model to use for populating
-      select: "username personal_details location profileImage",
+      select: "username company_details personal_details location profileImage",
     });
 
     console.log(followDetails);
@@ -158,6 +158,16 @@ const handleUnfollow = (Model) => async (req, res) => {
       user: userId,
       following: followingId,
     });
+
+    await Notification.findOneAndDelete({
+      userId: followingId,  // Send notification to the followed user
+      related_to: userId,  // Related user (follower)
+      notificationType: "follow", 
+    });
+
+    
+
+
 
     if (!result) {
       return res

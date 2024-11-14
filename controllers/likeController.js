@@ -90,7 +90,7 @@ const handleGetPostLikes = (Model) => async (req, res) => {
     // Fetch all users who liked the post
     const likes = await Model.find({ post: postId }).populate({
       path: "user",
-      select: "username profileImage", // Adjust based on your user fields
+      select: "username company_details  personal_details location profileImage",
     });
 
     res.json(likes);

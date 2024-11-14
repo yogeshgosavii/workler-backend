@@ -1,9 +1,10 @@
 import asyncHandler from "express-async-handler";
 import Post from "../models/postModel.js";
+import notificationController from "./notificationController.js";
 
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
-  console.log("imagesFinal",req.images);
+  console.log("imagesFinal", req.images);
   try {
     const data = new Model({
       ...req.body,
@@ -11,12 +12,37 @@ const handleCreate = (Model) => async (req, res) => {
       user: req.user._id,
     });
     await data.save();
+
+    // Use Promise.all to ensure all asynchronous operations complete
+    await Promise.all(
+      data.mentions?.map(async (mention) => {
+        const notificationData = {
+          userId: mention, // User receiving the notification (parent comment author)
+          related_to: req.user._id, // The user who made the reply
+          notificationType: "mention", // Notification type
+          actionId: data._id, // Example hardcoded ObjectId
+          message: `${req.user.username} mentioned you in their post`, // Custom message
+          contentId: data._id, 
+        };
+
+        // Create the notification using the notification controller
+        const notificationResult = await notificationController.createNotification({
+          body: notificationData,
+        });
+
+        if (!notificationResult.success) {
+          console.error("Notification creation error:", notificationResult.error);
+        }
+      })
+    );
+
     res.status(201).json(data);
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Server Error");
   }
 };
+
 
 const handleCreateJobPost = (Model) => async (req, res) => {
   try {
@@ -42,12 +68,14 @@ const handleUserGetAll = (Model) => async (req, res) => {
       .populate({
         path: "user", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details company_details location profileImage",
+        select:
+          "username personal_details company_details location profileImage",
       })
       .populate({
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details company_details location profileImage",
+        select:
+          "username personal_details company_details location profileImage",
       });
 
     res.json(data);
@@ -58,9 +86,9 @@ const handleUserGetAll = (Model) => async (req, res) => {
 };
 
 const handleGetPostByUserId = (Model) => async (req, res) => {
-  const {userId} = req.params
+  const { userId } = req.params;
   try {
-    const data = await Model.find({ user: userId})
+    const data = await Model.find({ user: userId })
       .populate({
         path: "jobs", // The field to populate
         model: "Job", // The model to use for populating
@@ -70,12 +98,14 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
       .populate({
         path: "user", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details company_details location profileImage",
+        select:
+          "username personal_details company_details location profileImage",
       })
       .populate({
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
-        select: "username personal_details company_details location profileImage",
+        select:
+          "username personal_details company_details location profileImage",
       });
 
     res.json(data);
@@ -88,22 +118,25 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
 // Get all documents (e.g., public posts)
 const handleGetAll = (Model) => async (req, res) => {
   try {
-    const data = await Model.find().populate({
-      path: "jobs", // The field to populate
-      model: "Job", // The model to use for populating
-      // Optional: Specify fields to include in the populated documents
-      select: "job_role company_name job_tags job_url",
-    })
-    .populate({
-      path: "user", // The field to populate
-      model: "User", // The model to use for populating
-      select: "username personal_details company_details location profileImage",
-    })
-    .populate({
-      path: "mentions", // The field to populate
-      model: "User", // The model to use for populating
-      select: "username personal_details company_details location profileImage",
-    });
+    const data = await Model.find()
+      .populate({
+        path: "jobs", // The field to populate
+        model: "Job", // The model to use for populating
+        // Optional: Specify fields to include in the populated documents
+        select: "job_role company_name job_tags job_url",
+      })
+      .populate({
+        path: "user", // The field to populate
+        model: "User", // The model to use for populating
+        select:
+          "username personal_details company_details location profileImage",
+      })
+      .populate({
+        path: "mentions", // The field to populate
+        model: "User", // The model to use for populating
+        select:
+          "username personal_details company_details location profileImage",
+      });
     res.json(data);
   } catch (error) {
     console.error("Error:", error);
@@ -115,24 +148,25 @@ const handleGetAll = (Model) => async (req, res) => {
 const handleGetById = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await Model.findById(id).populate({
-      path: "jobs", // The field to populate
-      model: "Job", // The model to use for populating
-      // Optional: Specify fields to include in the populated documents
-      select: "job_role company_name job_tags job_url",
-    })
-    .populate({
-      path: "user", // The field to populate
-      model: "User", // The model to use for populating
-      select: "username personal_details company_details  location profileImage",
-    })
-    .populate({
-      path: "mentions", // The field to populate
-      model: "User", // The model to use for populating
-      select: "username personal_details company_details location profileImage",
-    });
-
-
+    const data = await Model.findById(id)
+      .populate({
+        path: "jobs", // The field to populate
+        model: "Job", // The model to use for populating
+        // Optional: Specify fields to include in the populated documents
+        select: "job_role company_name job_tags job_url",
+      })
+      .populate({
+        path: "user", // The field to populate
+        model: "User", // The model to use for populating
+        select:
+          "username personal_details company_details  location profileImage",
+      })
+      .populate({
+        path: "mentions", // The field to populate
+        model: "User", // The model to use for populating
+        select:
+          "username personal_details company_details location profileImage",
+      });
 
     res.json(data);
   } catch (error) {
@@ -152,7 +186,7 @@ const handleUpdate = (Model) => async (req, res) => {
     images,
     content,
     post_type,
-    mentions
+    mentions,
   } = req.body;
   try {
     const { id } = req.params;
@@ -165,7 +199,7 @@ const handleUpdate = (Model) => async (req, res) => {
 
     data.likes = likes == [] ? null : likes;
     data.comments = comments == [] ? null : comments;
-    data.mentions = mentions
+    data.mentions = mentions;
     const updatedData = await data.save();
     res.json(updatedData);
   } catch (error) {
@@ -184,6 +218,9 @@ const handleDelete = (Model) => async (req, res) => {
       return res.status(404).json({ message: "Not found" });
     }
 
+    await Notification.deleteMany({ actionId: id });
+
+
     return res.status(200).json({ message: "Deletion successful" });
   } catch (error) {
     console.error("Error:", error);
@@ -200,4 +237,3 @@ export const getPostById = asyncHandler(handleGetById(Post)); // New export
 export const updatePost = asyncHandler(handleUpdate(Post));
 export const deletePost = asyncHandler(handleDelete(Post));
 export const getPostByUserId = asyncHandler(handleGetPostByUserId(Post));
-
