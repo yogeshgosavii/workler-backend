@@ -1,6 +1,8 @@
 import asyncHandler from "express-async-handler";
 import Post from "../models/postModel.js";
 import notificationController from "./notificationController.js";
+import { Job } from "../models/jobModel.js";
+
 
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
@@ -212,21 +214,31 @@ const handleUpdate = (Model) => async (req, res) => {
 const handleDelete = (Model) => async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Find and delete the main document
     const data = await Model.findByIdAndDelete(id);
 
     if (!data) {
       return res.status(404).json({ message: "Not found" });
     }
 
+    // Delete notifications related to this document
     await Notification.deleteMany({ actionId: id });
 
+    // Delete associated jobs
+    if (data.jobs && data.jobs.length > 0) {
+      await Promise.all(
+        data.jobs.map((jobId) => Job.findByIdAndDelete(jobId))
+      );
+    }
 
     return res.status(200).json({ message: "Deletion successful" });
   } catch (error) {
-    console.error("Error:", error);
-    return res.status(500).json({ message: "Server Error" });
+    console.error("Error:", error.message);
+    return res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
+
 
 // CRUD operations for Post
 export const addPost = asyncHandler(handleCreate(Post));

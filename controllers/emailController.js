@@ -52,23 +52,24 @@ const emailTemplates = {
         }
         .header {
             background-color: #1f2937;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            padding: 10px;
+            text-align: center;
             border-bottom: 1px solid #ffffff;
             color: #ffffff;
-            text-align: center;
         }
-        .header img {
+        .header-table {
+            width: 100%;
+        }
+        .header-logo {
             height: 40px;
+            vertical-align: middle;
         }
-        .header h1 {
+        .header-title {
             font-size: 25px;
             font-weight: bold;
             margin: 0;
             color: #ffffff;
+            vertical-align: middle;
         }
         .content {
             padding: 40px 20px;
@@ -110,9 +111,23 @@ const emailTemplates = {
 <body>
     <div class="email-container">
         <!-- Header with Logo and Title Centered Side by Side -->
-        <div class="header">
-            <img src="https://cdn-icons-png.flaticon.com/128/9323/9323534.png" alt="Company Logo" />
-            <h1>Workler</h1>
+       <div class="header">
+            <table class="header-table" role="presentation">
+                <tr>
+                    <td align="center" style="width: 100%;">
+                        <table role="presentation" style="margin: 0 auto;">
+                            <tr>
+                                <td align="right" style="padding-right: 10px;">
+                                    <img src="https://cdn-icons-png.flaticon.com/128/9323/9323534.png" alt="Company Logo" class="header-logo" />
+                                </td>
+                                <td align="left">
+                                    <h1 class="header-title">Workler</h1>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <!-- Content Section -->

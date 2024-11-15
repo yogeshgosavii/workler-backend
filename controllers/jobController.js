@@ -1,5 +1,9 @@
 import asyncHandler from "express-async-handler";
 import { Job } from "../models/jobModel.js";
+import Approach from "../models/approachModel.js";
+import Application from "../models/applicationModel.js";
+
+
 import {
   fetchJobDetailsFromRemotiveById,
   getExternalJobs,
@@ -136,6 +140,9 @@ const handleDelete = (Model) => async (req, res) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
+    await Approach.deleteMany({ job: data._id });
+    await Application.deleteMany({ job: data._id });
+    
     // Return a success message as JSON
     return res.status(200).json({ message: "Deletion successful" });
   } catch (error) {

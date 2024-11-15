@@ -94,8 +94,9 @@ const getUserNotifications = async (req, res) => {
           userId: 1,
           message: 1,
           notificationType: 1,
-          relatedUser: { username: 1, profileImage: 1 },
+          relatedUser: { username: 1, profileImage: 1 ,_id:1},
           populatedContent: 1,
+          actionId : 1,
           read: 1,
           createdAt: 1,
           updatedAt: 1

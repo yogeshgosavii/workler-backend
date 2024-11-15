@@ -2,6 +2,8 @@ import asyncHandler from "express-async-handler";
 import Follow from "../models/followModel.js";
 import notificationController from "../controllers/notificationController.js"; // Ensure you have the correct path
 import User from "../models/userModel.js";
+import { Notification } from "../models/notificationModule.js";
+
 
 // Create a new document and send notification
 const handleCreateFollow = (Model) => async (req, res) => {
