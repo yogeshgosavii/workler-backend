@@ -43,3 +43,23 @@ export const getUserResumes = async (req, res) => {
   }
 };
 
+
+export const deleteResumeById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Fetch resumes associated with the user
+    const resumes = await Resumes.findByIdAndDelete(id);
+
+    // Log and send the fetched resumes
+    console.log("resumes", resumes);
+    return res.status(200).json({ message: "Deletion successful" });
+
+  } catch (error) {
+    console.log("error", error);
+
+    // Send server error response
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
