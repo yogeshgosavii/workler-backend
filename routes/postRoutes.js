@@ -9,6 +9,7 @@ import {
   updatePost,
   getPostByUserId,
   getPostById,
+  getUserFollowingPosts,
 } from "../controllers/postController.js";
 import {
   likePost,
@@ -38,6 +39,9 @@ router.route("/post/job-post").post(protect, addJobPost);
 
 router.route("/all-posts").get(getPosts);
 
+router.route("/post/following").get(protect,getUserFollowingPosts); 
+
+
 router.route("/get-postby-userId/:userId").get(getPostByUserId);
 
 router
@@ -65,5 +69,7 @@ router.route("/post/comment/:commentId/reply").get(protect, getReplies); // Add 
 router.route("/post/:postId/comments").get(getComments); // Get all comments for a post
 
 router.route("/post/comment/:commentId").delete(protect, deleteComment); // Delete a comment
+
+
 
 export default router;

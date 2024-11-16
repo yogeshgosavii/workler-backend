@@ -21,8 +21,10 @@ export async function checkSaved(req, res) {
 
     const savedItem = await Saved.findOne({
       user: req.user._id,
-      // saved_content,
+      saved_content,
     });
+
+    
 
     res.status(200).json({ exists: !!savedItem });
   } catch (error) {
