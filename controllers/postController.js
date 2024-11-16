@@ -3,6 +3,8 @@ import Post from "../models/postModel.js";
 import notificationController from "./notificationController.js";
 import { Job } from "../models/jobModel.js";
 import Follow from "../models/followModel.js";
+import { Notification } from "../models/notificationModule.js";
+
 
 
 
