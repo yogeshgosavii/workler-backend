@@ -1,6 +1,6 @@
 import { Job } from '../models/jobModel.js';
 import User from '../models/userModel.js';
-import { fetchJobsFromRemotiveByQuery } from './externalJobsController.js';
+import { fetchJobsFromReedByQuery, fetchJobsFromRemotiveByQuery } from './externalJobsController.js';
 
 
 export async function searchByUsername(req, res) {
@@ -59,9 +59,11 @@ export async function searchJobsByKeyWords(req, res) {
             model: "User",
             select: "username company_details location profileImage",
         });
+        const reedJobs = await fetchJobsFromReedByQuery(keywords);
 
         const remotiveJobs = await fetchJobsFromRemotiveByQuery(keywords);
-        jobs = [...jobs, ...remotiveJobs];
+
+        jobs = [...jobs,...(reedJobs || []), ...remotiveJobs,];
 
         if (jobs.length === 0) {
             return res.status(404).json({ message: 'No jobs found matching the keyword.' });

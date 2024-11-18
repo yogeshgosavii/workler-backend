@@ -2,6 +2,9 @@
 import asyncHandler from 'express-async-handler';
 import axios from 'axios';
 import mongoose from 'mongoose';
+import dotenv from "dotenv";
+
+dotenv.config()
 
 // Function to fetch jobs from Remotive
 const fetchJobsFromRemotive = async () => {
@@ -13,6 +16,8 @@ const fetchJobsFromRemotive = async () => {
     throw new Error('Failed to fetch jobs from Remotive');
   }
 };
+
+
 export const fetchJobsFromRemotiveByQuery = async (query) => {
   try {
     console.log(query);
@@ -31,6 +36,33 @@ export const fetchJobsFromRemotiveByQuery = async (query) => {
     throw new Error('Failed to fetch jobs from Remotive');
   }
 };
+
+export const fetchJobsFromReedByQuery = async (query) => {
+  try {
+    console.log(query);
+    const apiKey = 'fd6b6531-c35b-492d-a029-9d9963b908e7'; // Your API Key
+
+    const encodedQuery = encodeURIComponent(query);
+    console.log(encodedQuery);
+    
+    const response = await axios.get(`https://www.reed.co.uk/api/1.0/search?keywords=frontend`, {
+      auth: {
+        username: apiKey, // Replace with your Reed API key
+        password: '', // Password should be left empty
+      },
+    })
+
+    
+    
+    const transFormedJobs = response.data?.results.map(job=>transformJobDataReed(job,""))
+    console.log("search",transFormedJobs);
+
+    return transFormedJobs; // Return jobs or an empty array
+  } catch (error) {
+    console.error("Error fetching jobs from Reeds:", error.message);
+  }
+};
+
 const jobCache = {};
 
 export const fetchJobDetailsFromRemotiveById = async (jobId) => {
@@ -68,47 +100,56 @@ export const fetchJobDetailsFromRemotiveById = async (jobId) => {
   }
 };
 
-// Function to fetch jobs from Adzuna
-const fetchJobsFromAdzuna = async (query) => {
-  try {
-    const response = await axios.get('https://api.adzuna.com/v1/api/jobs/us/search/1', {
-      params: query, // Use the query parameters from the request
-    });
-    return response.data.results || []; // Return jobs or an empty array
-  } catch (error) {
-    console.error("Error fetching jobs from Adzuna:", error.message);
-    throw new Error('Failed to fetch jobs from Adzuna');
-  }
-};
+export const fetchJobByIdFromReed = async (jobId) => {
+  console.log("reed",jobId);
+  
+  const apiKey = process.env.REED_API_KEY; // Your API Key
 
-// Function to fetch jobs from Coresignal
-const fetchJobsFromCoresignal = async (query) => {
   try {
-    const response = await axios.get('https://api.coresignal.com/jobs', {
-      headers: {
-        'Authorization': 'Bearer YOUR_CORESIGNAL_API_KEY' // Add your API key here
+    const response = await axios.get(` https://www.reed.co.uk/api/1.0/jobs/${jobId}`, {
+      auth: {
+        username: apiKey, // Replace with your Reed API key
+        password: '', // Password should be left empty
       },
-      params: query,
     });
-    return response.data.results || []; // Return jobs or an empty array
+
+    console.log(response);
+    
+  
+    const transFormedJobs = transformJobDataReed(response.data,"Reed")
+    // console.log("search",transFormedJobs);
+
+    // Return the job details or handle as needed
+    console.log("Job Details:", transFormedJobs);
+    return transFormedJobs;
   } catch (error) {
-    console.error("Error fetching jobs from Coresignal:", error.message);
-    throw new Error('Failed to fetch jobs from Coresignal');
+    console.error("Error fetching job by ID from Reed:", error.message);
+    throw new Error('Failed to fetch job details from Reed');
   }
 };
 
 // Function to fetch jobs from Reed
-const fetchJobsFromReed = async (query) => {
+const fetchJobsFromReed = async () => {
   try {
-    const response = await axios.get('https://www.reed.co.uk/api/1.0/search?keywords=accountant&location=london&employerid=123&distancefromlocation=15', {
-      headers: {
-        'Authorization': `Bearer fd6b6531-c35b-492d-a029-9d9963b908e7`, // Add your Reed API key here
-      },
-      params: query,
-    });
+    const apiKey = process.env.REED_API_KEY; // Your API Key
+    const response = await axios.get(
+      'https://www.reed.co.uk/api/1.0/search',
+      {
+        auth: {
+          username: apiKey, // Use the API key as the username
+          password: '', // Leave the password field empty
+        },
+      }
+    );
+    console.log("Jobs:", response.data.results);
     return response.data.results || []; // Return jobs or an empty array
   } catch (error) {
-    console.error("Error fetching jobs from Reed:", error.message);
+    if (error.response) {
+      console.error("Error response:", error.response.data);
+      console.error("Error status:", error.response.status);
+    } else {
+      console.error("Error message:", error.message);
+    }
     throw new Error('Failed to fetch jobs from Reed');
   }
 };
@@ -157,6 +198,44 @@ const transformJobData = (apiJob, source) => {
   };
 };
 
+const transformJobDataReed = (apiJob, source) => {
+  const salaryRange = {
+    min_salary: apiJob.minimumSalary || null,
+    max_salary: apiJob.maximumSalary || null,
+    currency_type: apiJob.currency || 'GBP', // Default to GBP if not specified
+  };
+
+  const location = {
+    country: apiJob.locationName || null,
+  };
+
+  return {
+    user: null,
+    _id: apiJob.jobId || null,
+    job_role: apiJob.jobTitle || '',
+    ...salaryRange,
+    salary_type: 'per annum', // Assuming annual salary as per Reed data
+    source,
+    description: apiJob.jobDescription || '',
+    company_name: apiJob.employerName || '',
+    location,
+    job_type: null, // Reed doesn't provide job type directly; can be enriched from elsewhere
+    skills_required: [], // No explicit field for skills in the Reed data
+    experience_type: null,
+    min_experience: null,
+    max_experience: null,
+    job_tags: [], // Reed doesn't provide tags directly
+    company_logo: '', // No logo field in the Reed data
+    job_url: apiJob.jobUrl || '',
+    job_source: source,
+    candidates_applied: [], // Optional; may need another source to fetch candidates
+    candidate_limit: null,
+    expiration_date: apiJob.expirationDate || null,
+    applications: apiJob.applications || 0, // Applications count from Reed data
+    posting_date: apiJob.date || null,
+  };
+};
+
 
 // Function to fetch and aggregate jobs from multiple sources
 export const fetchAllJobs = async (query) => {
@@ -166,20 +245,20 @@ export const fetchAllJobs = async (query) => {
     const remotiveJobs = await fetchJobsFromRemotive(query);
     // const adzunaJobs = await fetchJobsFromAdzuna(query);
     // const coresignalJobs = await fetchJobsFromCoresignal(query);
-    // const reedJobs = await fetchJobsFromReed(query); // Added Reed jobs
+    const reedJobs = await fetchJobsFromReed(); // Added Reed jobs
 
     // Transform the jobs into your schema format
     const transformedRemotiveJobs = remotiveJobs.map(job => transformJobData(job, 'Remotive'));
     // const transformedAdzunaJobs = adzunaJobs.map(job => transformJobData(job, 'Adzuna'));
     // const transformedCoresignalJobs = coresignalJobs.map(job => transformJobData(job, 'Coresignal'));
-    // const transformedReedJobs = reedJobs.map(job => transformJobData(job, 'Reed')); // Transform Reed jobs
+    const transformedReedJobs = reedJobs.map(job => transformJobDataReed(job, 'Reed')); // Transform Reed jobs
 
     // Aggregate jobs from all sources
     const allJobs = [
+      ...transformedReedJobs, // Added Reed jobs to the aggregation
       ...transformedRemotiveJobs,
       // ...transformedAdzunaJobs,
       // ...transformedCoresignalJobs,
-      // ...transformedReedJobs, // Added Reed jobs to the aggregation
     ];
 
     return allJobs;

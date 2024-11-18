@@ -6,6 +6,7 @@ import Application from "../models/applicationModel.js";
 
 import {
   fetchJobDetailsFromRemotiveById,
+  fetchJobByIdFromReed,
   getExternalJobs,
 } from "../controllers/externalJobsController.js"; // Import your external jobs controller
 
@@ -74,6 +75,9 @@ const handleGetById = (Model) => async (req, res) => {
 
     // Find the document by ID
     let data = await fetchJobDetailsFromRemotiveById(id); // You can populate any referenced fields if needed
+    if(!data){
+      data = await fetchJobByIdFromReed(id)
+    }
     console.log("data",data);
     
 
