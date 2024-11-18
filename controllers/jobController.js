@@ -9,6 +9,7 @@ import {
   fetchJobByIdFromReed,
   getExternalJobs,
 } from "../controllers/externalJobsController.js"; // Import your external jobs controller
+import mongoose from "mongoose";
 
 // Helper function to handle async/await and error responses
 const handleCreate = (Model) => async (req, res) => {
@@ -71,23 +72,29 @@ const handleGetAll = (Model) => async (req, res) => {
 
 const handleGetById = (Model) => async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id,source } = req.params;
 
     // Find the document by ID
-    let data = await fetchJobDetailsFromRemotiveById(id); // You can populate any referenced fields if needed
-    if(!data){
-      data = await fetchJobByIdFromReed(id)
-    }
-    console.log("data",data);
-    
+    let data = await fetchJobByIdFromReed(id)
 
-    if (!data) {
+    if (!data && mongoose.Types.ObjectId.isValid(id)) {
       data = await Model.findById(id).populate("user").select("-password");
       if(!data){
         return res.status(404).send('Resource not found');
 
       }
     }
+
+    if(!data){
+      data = await fetchJobDetailsFromRemotiveById(id); // You can populate any referenced fields if needed
+
+   }
+  
+   
+    console.log("data",data);
+    
+
+   
 
     // Ensure the user is authorized to view this document
 
