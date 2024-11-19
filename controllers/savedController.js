@@ -1,6 +1,8 @@
 import { Job } from "../models/jobModel.js";
 import Saved from "../models/savedModel.js";
 import User from "../models/userModel.js";
+import mongoose from "mongoose";
+
 
 // Create a saved content
 export async function createSaved(req, res) {
@@ -19,10 +21,14 @@ export async function checkSaved(req, res) {
   try {
     const { saved_content } = req.body; // Assuming saved_content is sent in the request body
 
-    const savedItem = await Saved.findOne({
-      user: req.user._id,
-      saved_content,
-    });
+    let savedItem = null
+
+    if(mongoose.Types.ObjectId.isValid(saved_content)){
+      savedItem = await Saved.findOne({
+        user: req.user._id,
+        saved_content,
+      });
+    }
 
     
 
