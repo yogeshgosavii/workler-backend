@@ -1,4 +1,5 @@
 import asyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 
 import Application from "../models/applicationModel.js";
 import notificationController from "./notificationController.js"; // Import the function
@@ -54,15 +55,19 @@ const handleCheckApplied = (Model) => async (req, res) => {
       }
   
       // Fetch data
-      const data = await Model.find({
+      let  data = null
+      
+      if(mongoose.Types.ObjectId.isValid(jobId)){  
+        data  = await Model.find({
         user: userId,
         job: jobId,
       });
+    }
   
       console.log("applied", data);
   
       // Return results
-      if(data.length>0){
+      if(data?.length>0){
         res.json({exists : true})
       }
       else{
@@ -82,7 +87,7 @@ const handleCheckApplied = (Model) => async (req, res) => {
 
       
       // Validate inputs
-      if (!jobId) {
+      if (!jobId ) {
         return res
           .status(400)
           .json({
@@ -92,14 +97,17 @@ const handleCheckApplied = (Model) => async (req, res) => {
       }
   
       // Fetch data
-      const data = await Model.find({
-        job: jobId,
-      });
-  
-      console.log("applied", data);
-  
+      let data = null
+
+      if(mongoose.Types.ObjectId.isValid(jobId)){  
+        data = await Model.find({
+          job: jobId,
+        });
+    
+        console.log("applied", data ||0);
+      }
       // Return results
-        res.json(data.length)
+        res.json(data?.length || 0)
 
       
     } catch (error) {
@@ -123,8 +131,12 @@ const handleGetUserApplications = (Model) => async (req, res) => {
         });
     }
 
+
     // Fetch data
-    const applicationDetails = await Model.find({
+    let applicationDetails
+    
+   if( mongoose.Types.ObjectId.isValid(userId)){
+    applicationDetails = await Model.find({
       user : userId
     }) .populate({
         path: "job", // The field to populate
@@ -141,6 +153,7 @@ const handleGetUserApplications = (Model) => async (req, res) => {
       })
 
     console.log(applicationDetails);
+   }
     
     // const skills = await Skill.find({user:approachDetails.user._id})
     // const workExperience = await WorkExperience.find({user:approachDetails.user._id})

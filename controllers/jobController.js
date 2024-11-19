@@ -76,6 +76,8 @@ const handleGetById = (Model) => async (req, res) => {
 
     // Find the document by ID
     let data = await fetchJobByIdFromReed(id)
+    console.log("job:",data);
+    
 
     if (!data && mongoose.Types.ObjectId.isValid(id)) {
       data = await Model.findById(id).populate("user").select("-password");
