@@ -1,6 +1,6 @@
 import { Job } from '../models/jobModel.js';
 import User from '../models/userModel.js';
-import { fetchJobsFromReedByQuery, fetchJobsFromRemotiveByQuery } from './externalJobsController.js';
+import { fetchJobsFromReed, fetchJobsFromRemotive ,fetchAllJobs } from './externalJobsController.js';
 
 
 export async function searchByUsername(req, res) {
@@ -22,21 +22,15 @@ export async function searchByUsername(req, res) {
 }
 
 export async function searchJobsByKeyWords(req, res) {
-    const { keyword } = req.query;
-    console.log("keyword", keyword);
-
-    if (!keyword) {
-        return res.status(400).json({ message: 'Keyword is required.' });
-    }
+    const { keyword, page = 1, limit = 10 } = req.query;
 
     const stopWords = ['the', 'a', 'an', 'and', 'of', 'in', 'on', 'at', 'for', 'with', 'to', 'by', 'is', 'it', 'from'];
 
-    let keywords = (keyword || "")
+    let keywords = keyword
         .split(" ")
         .map(word => word ? word.trim().toLowerCase() : null)
-        .filter(Boolean);
-
-    keywords = keywords.filter(word => !stopWords.includes(word));
+        .filter(Boolean)
+        .filter(word => !stopWords.includes(word));
 
     if (keywords.length === 0) {
         return res.status(400).json({ message: 'Please provide more specific keywords.' });
@@ -54,16 +48,25 @@ export async function searchJobsByKeyWords(req, res) {
 
         const finalQuery = { $or: regexQueries };
 
-        let jobs = await Job.find(finalQuery).populate({
-            path: "user",
-            model: "User",
-            select: "username company_details location profileImage",
-        });
-        const reedJobs = await fetchJobsFromReedByQuery(keywords);
+        const skip = (page - 1) * limit;
 
-        const remotiveJobs = await fetchJobsFromRemotiveByQuery(keywords);
+        let jobs = await Job.find(finalQuery)
+            .skip(skip)
+            .limit(limit)
+            .populate({
+                path: "user",
+                model: "User",
+                select: "username company_details location profileImage",
+            });
 
-        jobs = [...jobs,...(reedJobs || []), ...remotiveJobs,];
+        const allJobs = await fetchAllJobs(keywords, limit, page);
+
+        // Normalize external jobs
+        const externalJobs = allJobs.map(externalJob => ({
+            ...externalJob,
+        }));
+
+        jobs = [...jobs, ...externalJobs];
 
         if (jobs.length === 0) {
             return res.status(404).json({ message: 'No jobs found matching the keyword.' });
@@ -72,22 +75,28 @@ export async function searchJobsByKeyWords(req, res) {
         const rankedJobs = jobs.map(job => {
             let score = 0;
 
-            if (keywords.some(keyword => job.job_role?.toLowerCase().includes(keyword))) score += 3;
-            if (keywords.some(keyword => job.company_name?.toLowerCase().includes(keyword))) score += 2;
-            if (keywords.some(keyword => job.description?.toLowerCase().includes(keyword))) score += 1;
-            if (keywords.some(keyword => job.skills_required?.some(skill => skill?.toLowerCase().includes(keyword)))) score += 1;
+            if (job.job_role && keywords && keywords?.some(keyword => job.job_role.toLowerCase().includes(keyword))) score += 3;
+            if (job.company_name && keywords && keywords?.some(keyword => job.company_name.toLowerCase().includes(keyword))) score += 2;
+            if (job.description && keywords && keywords?.some(keyword => job.description.toLowerCase().includes(keyword))) score += 1;
+            if (job.skills_required && keywords && job.skills_required.some(skill => skill && keywords?.some(keyword => skill.toLowerCase().includes(keyword)))) score += 1;
 
             return { job, score };
         });
 
         rankedJobs.sort((a, b) => b.score - a.score);
 
-        res.json(rankedJobs.map(({ job }) => job));
+        res.json({
+            jobs: rankedJobs.map(({ job }) => job),
+            totalResults: rankedJobs.length,  // Correct total count of ranked jobs
+            page,
+            limit
+        });
     } catch (error) {
         console.error('Error searching jobs:', error.message, error.stack);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 }
+
 
 
 
