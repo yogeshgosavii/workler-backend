@@ -27,49 +27,52 @@ export const fetchJobsFromRemotive = async (query, limit = 10, page = 1) => {
 
 // Function to fetch jobs from Reed with pagination
 export const fetchJobsFromReed = async (query, limit = 10, page = 1) => {
-  
   try {
-    const apiKey = process.env.REED_API_KEY; // Your API Key
-    console.log("query",query[0]!== "undefined",query)
-    let response 
-    
-    if (query && Array.isArray(query) && query[0] !== "undefined" && query !=="" && query!== undefined ){
-      
-      response = await axios.get(`https://www.reed.co.uk/api/1.0/search`, {
-      auth: {
-        username: apiKey,
-        password: "", // Leave the password field empty
-      },
-      params: {
-        keywords:query,
-        resultsToSkip:page*limit,
-        resultsToTake : limit, // Added limit for pagination
-      },
-    });
-    }else{
+    const apiKey = process.env.REED_API_KEY; // API Key
+    if (!apiKey) {
+      console.error("REED_API_KEY is missing or undefined");
+      throw new Error("REED_API_KEY is missing");
+    }
+
+    console.log("Query provided:", query);
+    console.log("API Key:", apiKey);
+
+    let response;
+
+    const queryIsValid = query && Array.isArray(query) && query.length > 0 && query[0];
+    const params = queryIsValid
+      ? {
+          keywords: query,
+          resultsToSkip: page * limit,
+          resultsToTake: limit,
+        }
+      : {
+          resultsToSkip: page * limit,
+          resultsToTake: limit,
+        };
+
+    console.log("API Params:", params);
+
     response = await axios.get(`https://www.reed.co.uk/api/1.0/search`, {
       auth: {
         username: apiKey,
-        password: "", // Leave the password field empty
+        password: "", // Leave the password empty
       },
-      params: {
-        resultsToSkip:page*limit,
-        resultsToTake : limit, // Added limit for pagination
-      },
+      params,
     });
-    }
-    // console.log("data reed",response.data)
-    return response?.data?.results || []; // Return jobs or an empty array
+
+    return response?.data?.results || [];
   } catch (error) {
     if (error.response) {
-      console.error("Error response:", error.response.data);
-      console.error("Error status:", error.response.status);
+      console.error("API Response Error:", error.response.data);
+      console.error("Status Code:", error.response.status);
     } else {
-      console.error("Error message:", error.message);
+      console.error("Error Message:", error.message);
     }
     throw new Error("Failed to fetch jobs from Reed");
   }
 };
+
 
 // Function to fetch all jobs from different sources with pagination
 export const fetchAllJobs = async (query, limit = 10, page = 1) => {
