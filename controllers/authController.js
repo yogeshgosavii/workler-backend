@@ -277,6 +277,8 @@ export async function updateUserDetails(req, res) {
       saved_profiles,
     } = req.body;
 
+    console.log("req body",req.body)
+
     user.username = username ?? user.username;
     user.email = email ?? user.email;
     user.location = location ?? user.location;

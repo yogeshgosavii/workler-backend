@@ -21,6 +21,52 @@ export async function searchByUsername(req, res) {
     }
 }
 
+export async function searchUserByKeyword(req, res) {
+    const { keyword } = req.query;
+
+    console.log("Received query:", keyword);
+
+    // Define stopWords to filter out common words
+    const stopWords = ['the', 'a', 'an', 'and', 'or', 'but', 'to', 'with', 'by', 'for', 'of'];
+
+    // Process and filter keywords
+    const keywords = keyword
+        ?.split(" ")
+        ?.map(word => word.trim()) // Trim and convert to lowercase
+        ?.filter(Boolean) // Remove empty/null values
+        ?.filter(word => !stopWords.includes(word)); // Remove stop words
+
+    console.log("Processed keywords:", keywords);
+
+    if (!keyword || keywords.length === 0) {
+        return res.status(400).json({ error: 'Invalid or empty keyword provided.' });
+    }
+
+    try {
+        const users = await User.find({
+            $or: [
+                { username: { $regex: keyword, $options: 'i' } }, // Case-insensitive match for username
+                {
+                    tags: {
+                        $elemMatch: { $regex: new RegExp(keywords.join('|'), 'i') } // Case-insensitive tags match
+                    }
+                }            ]
+        }).select("_id username profileImage personal_details account_type company_details");
+
+        console.log("Users found:", users);
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'No users found with the given keyword.' });
+        }
+
+        // Return the found users as JSON
+        res.json(users);
+    } catch (error) {
+        console.error('Error searching by keyword:', error.message, error.stack);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}
+
 export async function searchJobsByKeyWords(req, res) {
     const { keyword, page = 1, limit = 10 } = req.query;
 
