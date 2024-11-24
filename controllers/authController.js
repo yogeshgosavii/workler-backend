@@ -277,30 +277,40 @@ export async function updateUserDetails(req, res) {
       saved_profiles,
     } = req.body;
 
-    console.log("req body",req.body)
+    console.log("Request Body:", req.body);
 
-    user.username = username ?? user.username;
-    user.email = email ?? user.email;
-    user.location = location ?? user.location;
-    user.description = description ?? user.description;
-    user.githubLink = githubLink ?? user.githubLink;
-    user.linkedInLink = linkedInLink ?? user.linkedInLink;
-    user.portfolioLink = portfolioLink ?? user.portfolioLink;
-    user.tags = tags ?? user.tags;
-    user.profileImage = req.images ?? user.profileImage;
-    user.bio = bio ?? user.bio;
-    user.personal_details = personal_details ?? user.personal_details;
-    user.company_details = company_details ?? user.company_details;
-    user.saved_jobs = saved_jobs ?? user.saved_jobs;
-    user.saved_profiles = saved_profiles ?? user.saved_profiles;
+    // Sanitize fields before updating
+    user.username = username?.trim() || user.username;
+    user.email = email?.trim() || user.email;
+    
+    // Ensure `location` is null if it's an empty string
+    user.location = location && typeof location === "object" ? location : user.location;
+    
+    user.description = description?.trim() || user.description;
+    user.githubLink = githubLink?.trim() || user.githubLink;
+    user.linkedInLink = linkedInLink?.trim() || user.linkedInLink;
+    user.portfolioLink = portfolioLink?.trim() || user.portfolioLink;
+    user.tags = Array.isArray(tags) ? tags : user.tags; // Ensure tags are an array
+    user.profileImage = req.images || user.profileImage;
+    user.bio = bio?.trim() || user.bio;
+
+    // Ensure personal_details and company_details are objects or keep existing
+    user.personal_details = typeof personal_details === "object" ? personal_details : user.personal_details;
+    user.company_details = typeof company_details === "object" ? company_details : user.company_details;
+
+    // Ensure saved_jobs and saved_profiles are arrays or keep existing
+    user.saved_jobs = Array.isArray(saved_jobs) ? saved_jobs : user.saved_jobs;
+    user.saved_profiles = Array.isArray(saved_profiles) ? saved_profiles : user.saved_profiles;
 
     const updatedUser = await user.save();
+
     res.json(updatedUser);
   } catch (error) {
     console.error("Error updating user details:", error.message, error.stack);
     res.status(500).send("Error updating user details");
   }
 }
+
 
 // Function to get user details
 export async function getUserDetails(req, res) {

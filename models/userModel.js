@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   description : {type: String},
   bio : {type : String},
   tags: { type: [String] },
-  location:{type : Location},
+  location:{type : Location, default: null},
   profileImage: { type: imageSchema }, 
   followers : {type :Number},
   following  : {type : Number},
