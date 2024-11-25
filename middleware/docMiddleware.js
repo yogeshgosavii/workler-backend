@@ -5,15 +5,41 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 // Function to upload a file to Firebase Storage
 const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
   try {
-    const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
-    const snapshot = await uploadBytes(fileRef, fileBuffer);
-    const publicUrl = await getDownloadURL(snapshot.ref);
+    // Create a new Promise with a timeout
+    const uploadPromise = new Promise((resolve, reject) => {
+      const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
+      
+      // Start the file upload process
+      const uploadTask = uploadBytes(fileRef, fileBuffer);
+      
+      uploadTask.then(async (snapshot) => {
+        try {
+          // Get the public URL of the uploaded file
+          const publicUrl = await getDownloadURL(snapshot.ref);
+          resolve(publicUrl); // Resolve with the URL
+        } catch (error) {
+          reject(new Error('Error getting download URL: ' + error.message));
+        }
+      }).catch((error) => {
+        reject(new Error('Error uploading file to Firebase: ' + error.message));
+      });
+
+      // Set a timeout (e.g., 30 seconds)
+      setTimeout(() => {
+        reject(new Error('File upload timeout'));
+      }, 30000); // Timeout after 30 seconds
+    });
+
+    // Wait for the upload promise to resolve or reject
+    const publicUrl = await uploadPromise;
     return publicUrl;
+    
   } catch (error) {
     console.error('Error uploading file to Firebase:', error.message);
     throw new Error('File upload failed');
   }
 };
+
 
 // Function to compress images
 const compressImage = async (imageBuffer) => {
@@ -83,34 +109,56 @@ export const imageMiddleware = async (req, res, next) => {
 };
 
 // Middleware for handling general file uploads
+// Retry logic for uploading a file in case of failure
+const uploadFileWithRetry = async (fileBuffer, fileName, folder, retries = 3) => {
+  try {
+    return await uploadFileToFirebase(fileBuffer, fileName, folder);
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`Retrying upload for file: ${fileName} (${retries} attempts left)`);
+      return uploadFileWithRetry(fileBuffer, fileName, folder, retries - 1);
+    } else {
+      throw new Error(`File upload failed after retries: ${fileName}`);
+    }
+  }
+};
+
+// Function to upload multiple files sequentially
+const uploadFilesSequentiallyWithRetry = async (files) => {
+  const fileUrls = [];
+
+  for (const file of files) {
+    try {
+      const fileUrl = await uploadFileWithRetry(file.buffer, file.originalname, 'files');
+      fileUrls.push({ fileUrl, filename: file.originalname });
+    } catch (error) {
+      console.error('Error uploading file after retries:', error.message);
+    }
+  }
+
+  return fileUrls;
+};
+
+// Middleware function for file handling
 export const fileMiddleware = async (req, res, next) => {
   console.log(req.body);
-  console.log("req:",req.files.files);
+  console.log("Files:", req.files ? req.files.files : 'No files');
 
-  
   try {
     if (!req.files.files || req.files.files.length === 0) {
-      return next();
+      return next(); // No files, proceed to the next middleware
     }
-    
 
-    const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
-      try {
-        const fileUrl = await uploadFileToFirebase(file.buffer, file.originalname, 'files');
+    // Upload files with retry logic
+    const uploadedFileUrls = await uploadFilesSequentiallyWithRetry(req.files.files);
 
-        return { fileUrl, filename: file.originalname };
-      } catch (error) {
-        console.error('Error processing file:', error.message);
-        throw new Error('File processing failed');
-      }
-    }));
-
+    // Attach uploaded file URLs to the request object
     req.filesUrls = uploadedFileUrls;
     console.log(uploadedFileUrls);
-    
-    next();
+
+    next();  // Continue to the next middleware (e.g., controller)
   } catch (error) {
-    console.log('Error during file upload:', error.message, error.stack);
+    console.error('Error during file upload:', error.message, error.stack);
     res.status(500).send('Error during file upload');
   }
 };
