@@ -254,9 +254,11 @@ export const resetPassword = async (req, res) => {
 };
 
 // Function to update user details
+// import User from "../models/User.js"; // Replace with your actual User model import
+
 export async function updateUserDetails(req, res) {
   try {
-    const user = req.user;
+    const user = req.user; // Assumes `req.user` is populated by middleware
     if (!user) {
       return res.status(404).send("User not found");
     }
@@ -279,30 +281,36 @@ export async function updateUserDetails(req, res) {
 
     console.log("Request Body:", req.body);
 
-    // Sanitize fields before updating
-    user.username = username?.trim() || user.username;
-    user.email = email?.trim() || user.email;
-    
-    // Ensure `location` is null if it's an empty string
-    user.location = location && typeof location === "object" ? location : user.location;
-    
-    user.description = description?.trim() || user.description;
-    user.githubLink = githubLink?.trim() || user.githubLink;
-    user.linkedInLink = linkedInLink?.trim() || user.linkedInLink;
-    user.portfolioLink = portfolioLink?.trim() || user.portfolioLink;
-    user.tags = Array.isArray(tags) ? tags : user.tags; // Ensure tags are an array
-    user.profileImage = req.images || user.profileImage;
-    user.bio = bio?.trim() || user.bio;
+    // Prepare updates dynamically
+    const updates = {
+      ...(username && { username: username.trim() }),
+      ...(email && { email: email.trim() }),
+      ...(location && typeof location === "object" && { location }),
+      ...(description && { description: description.trim() }),
+      ...(githubLink && { githubLink: githubLink.trim() }),
+      ...(linkedInLink && { linkedInLink: linkedInLink.trim() }),
+      ...(portfolioLink && { portfolioLink: portfolioLink.trim() }),
+      ...(tags && Array.isArray(tags) && { tags }),
+      ...(bio && { bio: bio.trim() }),
+      ...(req.images && { profileImage: req.images }),
+      ...(personal_details && typeof personal_details === "object" && { personal_details }),
+      ...(company_details && typeof company_details === "object" && { company_details }),
+      ...(saved_jobs && Array.isArray(saved_jobs) && { saved_jobs }),
+      ...(saved_profiles && Array.isArray(saved_profiles) && { saved_profiles }),
+    };
 
-    // Ensure personal_details and company_details are objects or keep existing
-    user.personal_details = typeof personal_details === "object" ? personal_details : user.personal_details;
-    user.company_details = typeof company_details === "object" ? company_details : user.company_details;
+    // Validate that there are updates to apply
+    if (Object.keys(updates).length === 0) {
+      return res.status(400).send("No valid fields to update");
+    }
 
-    // Ensure saved_jobs and saved_profiles are arrays or keep existing
-    user.saved_jobs = Array.isArray(saved_jobs) ? saved_jobs : user.saved_jobs;
-    user.saved_profiles = Array.isArray(saved_profiles) ? saved_profiles : user.saved_profiles;
+    console.time("Database Update");
+    const updatedUser = await User.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
+    console.timeEnd("Database Update");
 
-    const updatedUser = await user.save();
+    if (!updatedUser) {
+      return res.status(404).send("Failed to update user details");
+    }
 
     res.json(updatedUser);
   } catch (error) {
@@ -310,6 +318,7 @@ export async function updateUserDetails(req, res) {
     res.status(500).send("Error updating user details");
   }
 }
+
 
 
 // Function to get user details

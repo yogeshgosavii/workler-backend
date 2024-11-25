@@ -27,7 +27,7 @@ import { protect } from "../middleware/authMiddleware.js";
 import customUpload from "../middleware/uploadMiddleware.js";
 
 const router = express.Router();
-const upload = customUpload(5);
+const upload = customUpload(10);
 
 // Routes for Posts
 router
