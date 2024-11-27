@@ -96,17 +96,18 @@ const handleGetApproaches = (Model) => async (req, res) => {
   try {
     const { userId } = req.params;
 
+    // Validate input
     if (!userId) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "User ID is required",
-        });
+      return res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
     }
 
+    // Fetch approach details excluding those deleted by the user
     const approachDetails = await Model.find({
       user: userId,
+      deletedBy: { $ne: userId }, // Exclude approaches where the user ID is in the deletedBy array
     })
       .populate({
         path: "job",
@@ -125,6 +126,7 @@ const handleGetApproaches = (Model) => async (req, res) => {
     res.status(500).json({ status: "error", message: "Server Error" });
   }
 };
+
 
 const handleUpdateApproachStatus = async (req, res) => {
   const { id, status } = req.body;
@@ -160,6 +162,34 @@ const handleUpdateApproachStatus = async (req, res) => {
   }
 };
 
+const handleDeleteApproach = asyncHandler(async (req, res) => {
+  const { id } = req.params; // Approach ID
+  const userId = req.user._id; // Current user ID from request
+
+  try {
+    const approach = await Approach.findById(id);
+
+    if (!approach) {
+      return res.status(404).json({ status: "error", message: "Approach not found" });
+    }
+
+    // Handle deletion logic
+    if (!approach.deletedBy.includes(userId)) {
+      // Add user ID to deletedBy array
+      approach.deletedBy.push(userId);
+      await approach.save();
+      return res.status(200).json({ status: "success", message: "Approach marked as deleted for the user" });
+    } else {
+      // If the user ID already exists, remove the document entirely
+      await approach.remove();
+      return res.status(200).json({ status: "success", message: "Approach fully deleted" });
+    }
+  } catch (error) {
+    console.error("Delete approach error:", error.message);
+    return res.status(500).json({ status: "error", message: "Error deleting approach" });
+  }
+});
+
 
 // CRUD operations for Approach
 export const createApproach = asyncHandler(handleCreate(Approach));
@@ -167,3 +197,4 @@ export const checkApproached = asyncHandler(handleCheckApproached(Approach));
 export const getApproachDetails = asyncHandler(handleGetApproachedUsers(Approach));
 export const getUserApproachList = asyncHandler(handleGetApproaches(Approach));
 export const updateApproachStatus = asyncHandler(handleUpdateApproachStatus);
+export const deleteApproach = asyncHandler(handleDeleteApproach);

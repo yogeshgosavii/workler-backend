@@ -23,7 +23,9 @@ const applicationSchema = new Schema({
     status : {
         type : String,
         default : "sent"
-    }
+    },
+    deletedBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] }, // Array of user IDs who deleted the application
+
 
 },{timestamps:true});
 

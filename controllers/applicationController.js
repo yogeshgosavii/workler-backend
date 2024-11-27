@@ -116,80 +116,71 @@ const handleCheckApplied = (Model) => async (req, res) => {
     }
   };
 
-const handleGetUserApplications = (Model) => async (req, res) => {
-  try {
-    const { userId } = req.params;
-    console.log(userId);
-    
-    // Validate inputs
-    if (!userId ) {
-      return res
-        .status(400)
-        .json({
+  const handleGetUserApplications = (Model) => async (req, res) => {
+    try {
+      const { userId } = req.params;
+      console.log(userId);
+  
+      // Validate inputs
+      if (!userId) {
+        return res.status(400).json({
           status: "error",
-          message: "User ID are required",
+          message: "User ID is required",
         });
+      }
+  
+      // Fetch data excluding applications deleted by the user
+      let applicationDetails;
+  
+      if (mongoose.Types.ObjectId.isValid(userId)) {
+        applicationDetails = await Model.find({
+          user: userId,
+          deletedBy: { $ne: userId }, // Exclude applications where the user ID is in the deletedBy array
+        })
+          .populate({
+            path: "job", // The field to populate
+            model: "Job", // The model to use for populating
+          })
+          .populate({
+            path: "user", // The field to populate
+            model: "User", // The model to use for populating
+            select: "username personal_details location profileImage",
+          })
+          .populate({
+            path: "resume", // The field to populate
+            model: "Resume", // The model to use for populating
+          });
+  
+        console.log(applicationDetails);
+      }
+  
+      // Return results
+      res.json(applicationDetails);
+    } catch (error) {
+      console.error("Error:", error);
+      res.status(500).json({ status: "error", message: "Server Error" });
     }
-
-
-    // Fetch data
-    let applicationDetails
-    
-   if( mongoose.Types.ObjectId.isValid(userId)){
-    applicationDetails = await Model.find({
-      user : userId
-    }) .populate({
-        path: "job", // The field to populate
-        model: "Job", // The model to use for populating
-      })
-      .populate({
-        path: "user", // The field to populate
-        model: "User", // The model to use for populating
-        select: "username personal_details location profileImage",
-      })
-      .populate({
-        path: "resume", // The field to populate
-        model: "Resume", // The model to use for populating
-      })
-
-    console.log(applicationDetails);
-   }
-    
-    // const skills = await Skill.find({user:approachDetails.user._id})
-    // const workExperience = await WorkExperience.find({user:approachDetails.user._id})
-    // const education = await Education.find({user:approachDetails.user._id})
-    // const projects = await Project.find({user:approachDetails.user._id})
-
-
-
-
-    // Return results
-    res.json(applicationDetails);
-  } catch (error) {
-    console.error("Error:", error);
-    res.status(500).json({ status: "error", message: "Server Error" });
-  }
-};
+  };
+  
 
 const handleGetEmployeerApplications = (Model) => async (req, res) => {
   try {
     const { userId } = req.params;
-    console.log(userId);
-    
+
     // Validate inputs
-    if (!userId ) {
-      return res
-        .status(400)
-        .json({
-          status: "error",
-          message: "User ID are required",
-        });
+    if (!userId) {
+      return res.status(400).json({
+        status: "error",
+        message: "User ID is required",
+      });
     }
 
-    // Fetch data
+    // Fetch data excluding applications deleted by the user
     const applicationDetails = await Model.find({
-      employeer : userId
-    }).populate({
+      employeer: userId,
+      deletedBy: { $ne: userId }, // Exclude applications where the user ID is in the deletedBy array
+    })
+      .populate({
         path: "job", // The field to populate
         model: "Job", // The model to use for populating
       })
@@ -201,13 +192,7 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
       .populate({
         path: "resume", // The field to populate
         model: "Resume", // The model to use for populating
-      })
-
-    console.log(applicationDetails);
-    
-   
-
-
+      });
 
     // Return results
     res.json(applicationDetails);
@@ -216,6 +201,7 @@ const handleGetEmployeerApplications = (Model) => async (req, res) => {
     res.status(500).json({ status: "error", message: "Server Error" });
   }
 };
+
 
 
 
@@ -261,6 +247,63 @@ const handleUpdateApplicationStatus = (Model) => async (req, res) => {
   }
 };
 
+const handleDeleteApplication = (Model) => async (req, res) => {
+  try {
+    const { id } = req.params; // ID of the application to delete
+   
+    const userId  = req.user._id; // User performing the deletion
+
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      console.log("Valid Application ID is required")
+
+      return res.status(400).json({
+        status: "error",
+        message: "Valid Application ID is required",
+      });
+    }
+
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      console.log("Valid User ID is required")
+      return res.status(400).json({
+        status: "error",
+        message: "Valid User ID is required",
+      });
+    }
+
+    // Find the application
+    const application = await Model.findById(id);
+
+    if (!application) {
+      return res.status(404).json({ status: "error", message: "Application not found" });
+    }
+
+    // Check if `deletedBy` already includes the user ID
+    const deletedBy = application.deletedBy || []; // Initialize if `deletedBy` is null
+
+    if (!deletedBy.includes(userId)) {
+      // Add the current user to `deletedBy`
+      deletedBy.push(userId);
+      application.deletedBy = deletedBy;
+
+      if (deletedBy.length >= 2) {
+        // If two users (candidate and employer) have deleted, delete the application
+        await Model.findByIdAndDelete(id);
+        return res.status(200).json({ message: "Application fully deleted" });
+      }
+
+      // Save the updated application with `deletedBy`
+      await application.save();
+      return res.status(200).json({ message: "Application deletion tracked", application });
+    }
+
+    res.status(200).json({ message: "User already marked as deleted", application });
+  } catch (error) {
+    console.error("Delete application error:", error);
+    res.status(500).json({ status: "error", message: "Server Error" });
+  }
+};
+
+
 
 // CRUD operations for Post
 export const createApplication = asyncHandler(handleCreateApplication(Application));
@@ -269,6 +312,6 @@ export const getJobApplicantsCount = asyncHandler(handleGetJobApplicantsCount(Ap
 export const getUserApplications = asyncHandler(handleGetUserApplications(Application));
 export const getEmployeerApplications = asyncHandler(handleGetEmployeerApplications(Application));
 export const updateApplicationStatus = asyncHandler(handleUpdateApplicationStatus(Application));
-
+export const deleteApplication = asyncHandler(handleDeleteApplication(Application));
 
 

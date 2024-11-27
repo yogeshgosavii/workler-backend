@@ -16,7 +16,9 @@ const approachSchema = new Schema({
     status : {
         type : String,
         default : "approached"
-    }
+    },
+    deletedBy: { type: [Schema.Types.ObjectId], ref: 'User', default: [] }, // Array of user IDs who deleted the application
+
 
 },{timestamp : true});
 
