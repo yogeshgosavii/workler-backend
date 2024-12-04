@@ -6,7 +6,6 @@ export const addResume = async (req, res) => {
     if (!req.filesUrls) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-    console.log("finalFile",req.filesUrls);
     
     const resume = new Resumes({
       user: req.user._id,  // Assuming req.user contains authenticated user
@@ -18,7 +17,6 @@ export const addResume = async (req, res) => {
 
     res.status(201).json({ message: "Resume uploaded successfully", resume });
   } catch (error) {
-    console.log("error",error);
     
     res.status(500).json({ message: "Server error", error: error.message });
   }
@@ -32,11 +30,9 @@ export const getUserResumes = async (req, res) => {
     const resumes = await Resumes.find({ user: userId });
 
     // Log and send the fetched resumes
-    console.log("resumes", resumes);
     res.json(resumes);
 
   } catch (error) {
-    console.log("error", error);
 
     // Send server error response
     res.status(500).json({ message: "Server error", error: error.message });
@@ -52,11 +48,9 @@ export const deleteResumeById = async (req, res) => {
     const resumes = await Resumes.findByIdAndDelete(id);
 
     // Log and send the fetched resumes
-    console.log("resumes", resumes);
     return res.status(200).json({ message: "Deletion successful" });
 
   } catch (error) {
-    console.log("error", error);
 
     // Send server error response
     res.status(500).json({ message: "Server error", error: error.message });

@@ -10,7 +10,6 @@ import { Notification } from "../models/notificationModule.js";
 
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
-  console.log("imagesFinal", req.images);
   try {
     const data = new Model({
       ...req.body,
@@ -122,15 +121,12 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
 };
 
 const handleGetUserFollowingPosts = (PostModel,FollowingModel) => async (req, res) => {
-  // console.log("Hello")
   try {
     const currentUserId = req.user._id; // Assuming current user ID is set by authentication middleware
 
     // Fetch the current user's following list
-    console.log(currentUserId)
 
     const followingList = await FollowingModel.find({ user: currentUserId });
-    console.log("follow",followingList)
     // Extract the following IDs from the list of objects
     const followingIds = followingList.map((item) => item.following);
 

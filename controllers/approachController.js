@@ -60,6 +60,7 @@ const handleCheckApproached = (Model) => async (req, res) => {
 const handleGetApproachedUsers = (Model) => async (req, res) => {
   try {
     const { userId } = req.params;
+    console.log(userId)
 
     if (!userId) {
       return res
@@ -72,6 +73,8 @@ const handleGetApproachedUsers = (Model) => async (req, res) => {
 
     const approachDetails = await Model.find({
       employeer: userId,
+            deletedBy: { $ne: userId }, // Exclude approaches where the user ID is in the deletedBy array
+
     })
       .populate({
         path: "job",
@@ -103,6 +106,8 @@ const handleGetApproaches = (Model) => async (req, res) => {
         message: "User ID is required",
       });
     }
+    console.log("user", userId);
+    
 
     // Fetch approach details excluding those deleted by the user
     const approachDetails = await Model.find({
@@ -168,6 +173,7 @@ const handleDeleteApproach = asyncHandler(async (req, res) => {
 
   try {
     const approach = await Approach.findById(id);
+    console.log(approach)
 
     if (!approach) {
       return res.status(404).json({ status: "error", message: "Approach not found" });
@@ -181,7 +187,7 @@ const handleDeleteApproach = asyncHandler(async (req, res) => {
       return res.status(200).json({ status: "success", message: "Approach marked as deleted for the user" });
     } else {
       // If the user ID already exists, remove the document entirely
-      await approach.remove();
+      await Approach.findByIdAndDelete(id);
       return res.status(200).json({ status: "success", message: "Approach fully deleted" });
     }
   } catch (error) {

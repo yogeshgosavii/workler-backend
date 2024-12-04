@@ -24,7 +24,6 @@ export async function searchByUsername(req, res) {
 export async function searchUserByKeyword(req, res) {
     const { keyword } = req.query;
 
-    console.log("Received query:", keyword);
 
     // Define stopWords to filter out common words
     const stopWords = ['the', 'a', 'an', 'and', 'or', 'but', 'to', 'with', 'by', 'for', 'of'];
@@ -36,7 +35,6 @@ export async function searchUserByKeyword(req, res) {
         ?.filter(Boolean) // Remove empty/null values
         ?.filter(word => !stopWords.includes(word)); // Remove stop words
 
-    console.log("Processed keywords:", keywords);
 
     if (!keyword || keywords.length === 0) {
         return res.status(400).json({ error: 'Invalid or empty keyword provided.' });
@@ -53,7 +51,6 @@ export async function searchUserByKeyword(req, res) {
                 }            ]
         }).select("_id username profileImage personal_details account_type company_details");
 
-        console.log("Users found:", users);
 
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found with the given keyword.' });

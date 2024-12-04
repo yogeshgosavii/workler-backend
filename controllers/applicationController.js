@@ -12,7 +12,6 @@ const handleCreateApplication = (Model) => async (req, res) => {
       ...req.body,
     });
 
-    console.log(data);
     
     await data.save();
 
@@ -42,7 +41,6 @@ const handleCheckApplied = (Model) => async (req, res) => {
     try {
       const { userId, jobId } = req.body;
 
-      console.log(userId,jobId);
       
       // Validate inputs
       if (!userId || !jobId) {
@@ -64,7 +62,6 @@ const handleCheckApplied = (Model) => async (req, res) => {
       });
     }
   
-      console.log("applied", data);
   
       // Return results
       if(data?.length>0){
@@ -104,7 +101,6 @@ const handleCheckApplied = (Model) => async (req, res) => {
           job: jobId,
         });
     
-        console.log("applied", data ||0);
       }
       // Return results
         res.json(data?.length || 0)
@@ -119,7 +115,6 @@ const handleCheckApplied = (Model) => async (req, res) => {
   const handleGetUserApplications = (Model) => async (req, res) => {
     try {
       const { userId } = req.params;
-      console.log(userId);
   
       // Validate inputs
       if (!userId) {
@@ -151,7 +146,6 @@ const handleCheckApplied = (Model) => async (req, res) => {
             model: "Resume", // The model to use for populating
           });
   
-        console.log(applicationDetails);
       }
   
       // Return results
@@ -254,7 +248,6 @@ const handleDeleteApplication = (Model) => async (req, res) => {
     const userId  = req.user._id; // User performing the deletion
 
     if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-      console.log("Valid Application ID is required")
 
       return res.status(400).json({
         status: "error",
@@ -263,7 +256,6 @@ const handleDeleteApplication = (Model) => async (req, res) => {
     }
 
     if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
-      console.log("Valid User ID is required")
       return res.status(400).json({
         status: "error",
         message: "Valid User ID is required",
