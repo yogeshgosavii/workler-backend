@@ -4,29 +4,23 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 // Function to upload a file to Firebase Storage
 const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
-  const start = Date.now();
   try {
     const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
     const snapshot = await uploadBytes(fileRef, fileBuffer);
-    const fileUrl = await getDownloadURL(snapshot.ref);
-    console.log(`Upload ${fileName} completed in ${Date.now() - start}ms`);
-    return fileUrl;
+    return await getDownloadURL(snapshot.ref);
   } catch (error) {
     console.error('Error uploading file to Firebase:', error.message);
     throw new Error('File upload failed');
   }
 };
 
-// Function to compress images with better efficiency
+// Function to compress images more efficiently
 const compressImage = async (imageBuffer) => {
-  const start = Date.now();
   try {
-    const compressedBuffer = await sharp(imageBuffer)
-      .resize(300, 300, { fit: sharp.fit.inside, withoutEnlargement: true }) // Smaller dimensions for faster processing
-      .jpeg({ quality: 20 }) // Lower quality for faster upload
+    return await sharp(imageBuffer)
+      .resize(500, 500, { fit: sharp.fit.inside, withoutEnlargement: true }) // Resize for faster processing
+      .jpeg({ quality: 30 }) // Lower quality for better performance
       .toBuffer();
-    console.log(`Image compression completed in ${Date.now() - start}ms`);
-    return compressedBuffer;
   } catch (error) {
     console.error('Error compressing image:', error.message);
     throw new Error('Image compression failed');
@@ -34,48 +28,38 @@ const compressImage = async (imageBuffer) => {
 };
 
 // Middleware for handling image uploads with compression
-// Middleware for handling image uploads with compression
 export const imageMiddleware = async (req, res, next) => {
+  const startProcess = Date.now();
   try {
     if (!req.files || !req.files.files || req.files.files.length === 0) {
       return next();
     }
 
     const originalImages = req.files.files;
-    const startProcess = Date.now();
-
-    // Limit batch size for optimal performance
-    const batchSize = 3; // Reduced batch size to lessen memory usage
     const uploadedImageUrls = [];
 
-    for (let i = 0; i < originalImages.length; i += batchSize) {
-      const batch = originalImages.slice(i, i + batchSize);
+    // Parallelize image compression and upload
+    const imageUploadPromises = originalImages.map(async (image) => {
+      console.log(`Processing image: ${image.originalname}`);
+      
+      // Compress the image
+      const compressedImageBuffer = await compressImage(image.buffer);
+      // Upload both original and compressed images concurrently
+      const [originalImageUrl, compressedImageUrl] = await Promise.all([
+        uploadFileToFirebase(image.buffer, image.originalname, 'images/original'),
+        uploadFileToFirebase(compressedImageBuffer, `compressed_${image.originalname}`, 'images/compressed')
+      ]);
 
-      const batchResults = await Promise.all(
-        batch.map(async (image) => {
-          // Upload the original image
-          const originalImageUrl = await uploadFileToFirebase(
-            image.buffer,
-            image.originalname,
-            'images/original'
-          );
+      return {
+        originalImage: originalImageUrl,
+        compressedImage: compressedImageUrl,
+      };
+    });
 
-          // Compress the image
-          const compressedImageBuffer = await compressImage(image.buffer);
+    // Wait for all image uploads to complete
+    const imageResults = await Promise.all(imageUploadPromises);
 
-          // Upload the compressed image
-          const compressedImageUrl = await uploadFileToFirebase(
-            compressedImageBuffer,
-            `compressed_${image.originalname}`,
-            'images/compressed'
-          );
-
-          return { originalImage: originalImageUrl, compressedImage: compressedImageUrl };
-        })
-      );
-
-      uploadedImageUrls.push(...batchResults);
-    }
+    uploadedImageUrls.push(...imageResults);
 
     req.images = {
       originalImage: uploadedImageUrls.map((url) => url.originalImage),

@@ -257,9 +257,12 @@ export const resetPassword = async (req, res) => {
 // import User from "../models/User.js"; // Replace with your actual User model import
 
 export async function updateUserDetails(req, res) {
+  console.time("Total Request Time"); // Start total timer
+
   try {
     const user = req.user; // Assumes `req.user` is populated by middleware
     if (!user) {
+      console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(404).send("User not found");
     }
 
@@ -281,7 +284,6 @@ export async function updateUserDetails(req, res) {
 
     console.log("Request Body:", req.body);
 
-    // Prepare updates dynamically
     const updates = {
       ...(username && { username: username.trim() }),
       ...(email && { email: email.trim() }),
@@ -299,8 +301,8 @@ export async function updateUserDetails(req, res) {
       ...(saved_profiles && Array.isArray(saved_profiles) && { saved_profiles }),
     };
 
-    // Validate that there are updates to apply
     if (Object.keys(updates).length === 0) {
+      console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(400).send("No valid fields to update");
     }
 
@@ -309,11 +311,14 @@ export async function updateUserDetails(req, res) {
     console.timeEnd("Database Update");
 
     if (!updatedUser) {
+      console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(404).send("Failed to update user details");
     }
 
+    console.timeEnd("Total Request Time"); // End total timer on success
     res.json(updatedUser);
   } catch (error) {
+    console.timeEnd("Total Request Time"); // End total timer on error
     console.error("Error updating user details:", error.message, error.stack);
     res.status(500).send("Error updating user details");
   }
