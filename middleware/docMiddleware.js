@@ -17,13 +17,13 @@ const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
   }
 };
 
-// Function to compress images
+// Function to compress images with better efficiency
 const compressImage = async (imageBuffer) => {
   const start = Date.now();
   try {
     const compressedBuffer = await sharp(imageBuffer)
-      .resize(600, 600, { fit: sharp.fit.inside, withoutEnlargement: true }) // Smaller dimensions
-      .jpeg({ quality: 30 }) // Lower quality for faster upload
+      .resize(300, 300, { fit: sharp.fit.inside, withoutEnlargement: true }) // Smaller dimensions for faster processing
+      .jpeg({ quality: 20 }) // Lower quality for faster upload
       .toBuffer();
     console.log(`Image compression completed in ${Date.now() - start}ms`);
     return compressedBuffer;
@@ -44,7 +44,7 @@ export const imageMiddleware = async (req, res, next) => {
     const startProcess = Date.now();
 
     // Limit batch size for optimal performance
-    const batchSize = 5;
+    const batchSize = 3; // Reduced batch size to lessen memory usage
     const uploadedImageUrls = [];
 
     for (let i = 0; i < originalImages.length; i += batchSize) {
@@ -55,25 +55,17 @@ export const imageMiddleware = async (req, res, next) => {
           // Compress the image
           const compressedImageBuffer = await compressImage(image.buffer);
 
-          // Upload original and compressed images
-          const [originalImageUrl, compressedImageUrl] = await Promise.all([
-            uploadFileToFirebase(image.buffer, image.originalname, 'images/original'),
-            uploadFileToFirebase(compressedImageBuffer, `compressed_${image.originalname}`, 'images/compressed'),
-          ]);
+          // Upload the compressed image only (optional to upload original separately)
+          const compressedImageUrl = await uploadFileToFirebase(compressedImageBuffer, `compressed_${image.originalname}`, 'images/compressed');
 
-          return {
-            originalImage: originalImageUrl,
-            compressedImage: compressedImageUrl,
-          };
+          return { compressedImage: compressedImageUrl };
         })
       );
 
       uploadedImageUrls.push(...batchResults);
     }
 
-    // Set both original and compressed image URLs in the request object
     req.images = {
-      originalImage: uploadedImageUrls.map((url) => url.originalImage),
       compressedImage: uploadedImageUrls.map((url) => url.compressedImage),
     };
 
@@ -84,7 +76,6 @@ export const imageMiddleware = async (req, res, next) => {
     res.status(500).send('Error during image upload');
   }
 };
-
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
