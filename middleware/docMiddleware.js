@@ -34,6 +34,7 @@ const compressImage = async (imageBuffer) => {
 };
 
 // Middleware for handling image uploads with compression
+// Middleware for handling image uploads with compression
 export const imageMiddleware = async (req, res, next) => {
   try {
     if (!req.files || !req.files.files || req.files.files.length === 0) {
@@ -52,13 +53,24 @@ export const imageMiddleware = async (req, res, next) => {
 
       const batchResults = await Promise.all(
         batch.map(async (image) => {
+          // Upload the original image
+          const originalImageUrl = await uploadFileToFirebase(
+            image.buffer,
+            image.originalname,
+            'images/original'
+          );
+
           // Compress the image
           const compressedImageBuffer = await compressImage(image.buffer);
 
-          // Upload the compressed image only (optional to upload original separately)
-          const compressedImageUrl = await uploadFileToFirebase(compressedImageBuffer, `compressed_${image.originalname}`, 'images/compressed');
+          // Upload the compressed image
+          const compressedImageUrl = await uploadFileToFirebase(
+            compressedImageBuffer,
+            `compressed_${image.originalname}`,
+            'images/compressed'
+          );
 
-          return { compressedImage: compressedImageUrl };
+          return { originalImage: originalImageUrl, compressedImage: compressedImageUrl };
         })
       );
 
@@ -66,6 +78,7 @@ export const imageMiddleware = async (req, res, next) => {
     }
 
     req.images = {
+      originalImage: uploadedImageUrls.map((url) => url.originalImage),
       compressedImage: uploadedImageUrls.map((url) => url.compressedImage),
     };
 
@@ -76,6 +89,7 @@ export const imageMiddleware = async (req, res, next) => {
     res.status(500).send('Error during image upload');
   }
 };
+
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
