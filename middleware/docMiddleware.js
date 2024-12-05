@@ -1,13 +1,14 @@
 import sharp from 'sharp';
 import { storage } from '../firebaseConfig.js';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import Image from '../models/imageModel.js'; // Ensure this path is correct
 
+// Function to upload a file to Firebase Storage
 const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
   try {
     const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
     const snapshot = await uploadBytes(fileRef, fileBuffer);
     const publicUrl = await getDownloadURL(snapshot.ref);
+    console.log("url:",publicUrl)
     return publicUrl;
   } catch (error) {
     console.error('Error uploading file to Firebase:', error.message);
@@ -15,6 +16,7 @@ const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
   }
 };
 
+// Function to compress images
 const compressImage = async (imageBuffer) => {
   try {
     const compressedImageBuffer = await sharp(imageBuffer)
@@ -28,16 +30,16 @@ const compressImage = async (imageBuffer) => {
   }
 };
 
+// Middleware for handling image uploads with compression
 export const imageMiddleware = async (req, res, next) => {
-  console.log('Files:', req.files); // Check this output
-  console.log('Body:', req.body);
-
   try {
-    if (!req.files || !req.files.images || req.files.images.length === 0) {
+    if (!req.files || !req.files.files || req.files.files.length === 0) {
       return next();
     }
+    console.log("images : ",req.files.files);
+    
 
-    const originalImages = req.files.images;
+    const originalImages = req.files.files;
     if (!Array.isArray(originalImages)) {
       return res.status(400).send('No images uploaded');
     }
@@ -68,47 +70,52 @@ export const imageMiddleware = async (req, res, next) => {
       }
     }));
 
-    // Save image metadata to the database (if needed)
-    const images = {
-      originalImage: uploadedImageUrls.map(urls => urls.originalImage),
-      compressedImage: uploadedImageUrls.map(urls => urls.compressedImage)
+    req.images = {
+      originalImage: uploadedImageUrls.map(url => url.originalImage),
+      compressedImage: uploadedImageUrls.map(url => url.compressedImage)
     };
 
-    req.images = images;
     next();
   } catch (error) {
-    console.error('Error during file upload:', error.message, error.stack);
-    res.status(500).send('Error during file upload');
+    console.error('Error during image upload:', error.message, error.stack);
+    res.status(500).send('Error during image upload');
   }
 };
 
-
-
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
+  console.log(req.body);
+  console.log("req:",req.files.files);
+
+  
   try {
-    if (!req.files || !req.files.files || req.files.files.length === 0) {
+    if (!req.files.files || req.files.files.length === 0) {
       return next();
     }
+    
 
-    const startProcess = Date.now();
-    const uploadedFiles = await Promise.all(
-      req.files.files.map(async (file) => {
+    const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
+      try {
         const fileUrl = await uploadFileToFirebase(file.buffer, file.originalname, 'files');
-        return { fileUrl, filename: file.originalname };
-      })
-    );
 
-    req.filesUrls = uploadedFiles;
-    console.log(`Total file upload process completed in ${Date.now() - startProcess}ms`);
+        return { fileUrl, filename: file.originalname };
+      } catch (error) {
+        console.error('Error processing file:', error.message);
+        throw new Error('File processing failed');
+      }
+    }));
+
+    req.filesUrls = uploadedFileUrls;
+    console.log(uploadedFileUrls);
+    
     next();
   } catch (error) {
-    console.error('Error during file upload:', error.message);
+    console.log('Error during file upload:', error.message, error.stack);
     res.status(500).send('Error during file upload');
   }
 };
 
 export default {
   imageMiddleware,
-  fileMiddleware,
+  fileMiddleware
 };
