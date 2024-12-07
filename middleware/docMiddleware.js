@@ -2,40 +2,22 @@ import sharp from 'sharp';
 import { storage } from '../firebaseConfig.js';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
-// Function to upload a file to Firebase Storage
+// Upload file to Firebase
 const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
-  try {
-    const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
-    const snapshot = await uploadBytes(fileRef, fileBuffer);
-    return await getDownloadURL(snapshot.ref);
-  } catch (error) {
-    console.error('Error uploading file to Firebase:', error.message);
-    throw new Error('File upload failed');
-  }
+  const fileRef = ref(storage, `${folder}/${Date.now()}_${fileName}`);
+  const snapshot = await uploadBytes(fileRef, fileBuffer);
+  return getDownloadURL(snapshot.ref);
 };
 
-// Function to compress images
+// Compress image using optimal settings
 const compressImage = async (imageBuffer) => {
-  try {
-    return await sharp(imageBuffer)
-      .resize({
-        width: 1200, // Smaller dimensions for faster resizing
-        height: 1200,
-        fit: sharp.fit.inside,
-        withoutEnlargement: true
-      })
-      .jpeg({
-        quality: 50, // Lower quality for faster processing
-        progressive: true
-      })
-      .toBuffer();
-  } catch (error) {
-    console.error('Error compressing image:', error.message);
-    throw new Error('Image compression failed');
-  }
+  return sharp(imageBuffer)
+    .resize({ width: 640, height: 640, fit: sharp.fit.contain }) // Smaller resizing dimensions
+    .jpeg({ quality: 30 }) // Further reduce quality for faster processing
+    .toBuffer();
 };
 
-// Middleware for handling image uploads with compression
+// Middleware for efficient image upload with parallel processing
 export const imageMiddleware = async (req, res, next) => {
   try {
     if (!req.files || !req.files.files || req.files.files.length === 0) {
@@ -43,34 +25,32 @@ export const imageMiddleware = async (req, res, next) => {
     }
 
     const originalImages = req.files.files;
+
     if (!Array.isArray(originalImages)) {
       return res.status(400).send('No images uploaded');
     }
 
-    // Upload both original and compressed images
+    // Perform compression and upload in parallel for each image
     const uploadedImageUrls = await Promise.all(
       originalImages.map(async (image) => {
-        try {
-          const [compressedBuffer, originalUrl, compressedUrl] = await Promise.all([
-            compressImage(image.buffer),
-            uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Upload original
-            uploadFileToFirebase(await compressImage(image.buffer), `compressed_${image.originalname}`, 'images/compressed') // Upload compressed
-          ]);
+        // Compress the image in parallel with the upload
+        const compressedBuffer = await compressImage(image.buffer);
+        
+        const [originalUrl, compressedUrl] = await Promise.all([
+          uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Original upload
+          uploadFileToFirebase(compressedBuffer, `compressed_${image.originalname}`, 'images/compressed'), // Compressed upload
+        ]);
 
-          return {
-            originalImage: originalUrl,
-            compressedImage: compressedUrl
-          };
-        } catch (error) {
-          console.error('Error processing image:', error.message);
-          throw new Error('Image processing failed');
-        }
+        return {
+          originalImage: originalUrl,
+          compressedImage: compressedUrl,
+        };
       })
     );
 
     req.images = {
       originalImage: uploadedImageUrls.map((url) => url.originalImage),
-      compressedImage: uploadedImageUrls.map((url) => url.compressedImage)
+      compressedImage: uploadedImageUrls.map((url) => url.compressedImage),
     };
 
     next();
