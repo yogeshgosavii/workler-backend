@@ -11,10 +11,7 @@ const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
 
 // Compress image using optimal settings
 const compressImage = async (imageBuffer) => {
-  return sharp(imageBuffer)
-    .resize({ width: 640, height: 640, fit: sharp.fit.contain })
-    .webp({ quality: 30 }) // Using WebP for better compression
-    .toBuffer();
+  return imageBuffer
 };
 
 // Middleware for efficient image upload with parallel processing
