@@ -33,6 +33,9 @@ export const imageMiddleware = async (req, res, next) => {
     // Perform compression and upload both original and compressed images in parallel
     const uploadedImageUrls = await Promise.all(
       originalImages.map(async (image) => {
+        // Log the original image size (in bytes)
+        console.log(`Original image size: ${image.size / 1024} KB`);
+
         // Compress the image in parallel with the upload
         const compressedBuffer = await compressImage(image.buffer);
 
@@ -61,7 +64,6 @@ export const imageMiddleware = async (req, res, next) => {
     res.status(500).send('Error during image upload');
   }
 };
-
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
