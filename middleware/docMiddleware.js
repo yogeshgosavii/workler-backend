@@ -47,12 +47,20 @@ export const imageMiddleware = async (req, res, next) => {
       return res.status(400).send('No images uploaded');
     }
 
+    // Upload both original and compressed images
     const uploadedImageUrls = await Promise.all(
       originalImages.map(async (image) => {
         try {
-          const compressedBuffer = await compressImage(image.buffer);
-          const compressedUrl = await uploadFileToFirebase(compressedBuffer, `compressed_${image.originalname}`, 'images/compressed');
-          return { compressedImage: compressedUrl };
+          const [compressedBuffer, originalUrl, compressedUrl] = await Promise.all([
+            compressImage(image.buffer),
+            uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Upload original
+            uploadFileToFirebase(await compressImage(image.buffer), `compressed_${image.originalname}`, 'images/compressed') // Upload compressed
+          ]);
+
+          return {
+            originalImage: originalUrl,
+            compressedImage: compressedUrl
+          };
         } catch (error) {
           console.error('Error processing image:', error.message);
           throw new Error('Image processing failed');
@@ -61,6 +69,7 @@ export const imageMiddleware = async (req, res, next) => {
     );
 
     req.images = {
+      originalImage: uploadedImageUrls.map((url) => url.originalImage),
       compressedImage: uploadedImageUrls.map((url) => url.compressedImage)
     };
 
