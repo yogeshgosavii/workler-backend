@@ -12,8 +12,8 @@ const uploadFileToFirebase = async (fileBuffer, fileName, folder) => {
 // Compress image using optimal settings
 const compressImage = async (imageBuffer) => {
   return sharp(imageBuffer)
-    .resize({ width: 640, height: 640, fit: sharp.fit.contain }) // Smaller resizing dimensions
-    .jpeg({ quality: 30 }) // Further reduce quality for faster processing
+    .resize({ width: 640, height: 640, fit: sharp.fit.contain })
+    .webp({ quality: 30 }) // Using WebP for better compression
     .toBuffer();
 };
 
@@ -30,12 +30,13 @@ export const imageMiddleware = async (req, res, next) => {
       return res.status(400).send('No images uploaded');
     }
 
-    // Perform compression and upload in parallel for each image
+    // Perform compression and upload both original and compressed images in parallel
     const uploadedImageUrls = await Promise.all(
       originalImages.map(async (image) => {
         // Compress the image in parallel with the upload
         const compressedBuffer = await compressImage(image.buffer);
-        
+
+        // Upload both the original and compressed images in parallel
         const [originalUrl, compressedUrl] = await Promise.all([
           uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Original upload
           uploadFileToFirebase(compressedBuffer, `compressed_${image.originalname}`, 'images/compressed'), // Compressed upload
@@ -48,6 +49,7 @@ export const imageMiddleware = async (req, res, next) => {
       })
     );
 
+    // Attach both original and compressed image URLs to the request object
     req.images = {
       originalImage: uploadedImageUrls.map((url) => url.originalImage),
       compressedImage: uploadedImageUrls.map((url) => url.compressedImage),
@@ -59,6 +61,7 @@ export const imageMiddleware = async (req, res, next) => {
     res.status(500).send('Error during image upload');
   }
 };
+
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {

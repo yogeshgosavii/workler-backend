@@ -7,17 +7,16 @@ const transporter = createTransport({
   host: process.env.SMTP_HOST,
   port: process.env.SMTP_PORT,
   secure: process.env.SMTP_PORT === "465", // Automatically set secure based on port
-  logger :true,
-  debug : true,
+  logger: true,
+  debug: true,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
-   tls: {
+  tls: {
     // do not fail on invalid certs
     rejectUnauthorized: false,
   },
-
 });
 
 // Helper function to generate OTP
@@ -110,8 +109,7 @@ const emailTemplates = {
 </head>
 <body>
     <div class="email-container">
-        <!-- Header with Logo and Title Centered Side by Side -->
-       <div class="header">
+        <div class="header">
             <table class="header-table" role="presentation">
                 <tr>
                     <td align="center" style="width: 100%;">
@@ -130,30 +128,27 @@ const emailTemplates = {
             </table>
         </div>
 
-        <!-- Content Section -->
         <div class="content">
             <h1>Your One-Time Passcode</h1>
             <p class="message">Please use the OTP below to complete your sign-in. This code will expire in 10 minutes.</p>
             <div class="otp-code">${otp}</div>
         </div>
 
-        <!-- Footer Section -->
         <div class="footer">
             <p>If you did not request this code, please disregard this email or contact support.</p>
             <p>© 2024 Workler. All rights reserved.</p>
         </div>
     </div>
 </body>
-</html>
-
-
-`,
+</html>`
   }),
+  
   welcome: (userName) => ({
     subject: "Welcome to Our Service!",
     text: `Hello ${userName}, welcome to our service! We’re excited to have you onboard.`,
     html: `<p>Hello <strong>${userName}</strong>, welcome to our service! We’re excited to have you onboard.</p>`,
   }),
+
   passwordReset: (resetLink) => ({
     subject: "Password Reset Request",
     text: `You requested a password reset. Click the link below to reset your password: ${resetLink}`,
@@ -247,7 +242,6 @@ const emailTemplates = {
 </head>
 <body>
     <div class="email-container">
-        <!-- Header with Logo and Title Side by Side -->
         <div class="header">
             <table class="header-table" role="presentation">
                 <tr>
@@ -267,26 +261,21 @@ const emailTemplates = {
             </table>
         </div>
 
-        <!-- Content Section -->
         <div class="content">
             <h1>Password Reset Request</h1>
             <p class="message">We received a request to reset your password. To proceed, click the link below to set a new password.</p>
             <a href="${resetLink}" class="reset-link">Reset Your Password</a>
         </div>
 
-        <!-- Validity Note -->
         <p class="note"><b>Note:</b> This link is valid for next one hour.</p>
 
-        <!-- Footer Section -->
         <div class="footer">
             <p>If you did not request this change, please ignore this email or contact support.</p>
             <p>© 2024 Workler. All rights reserved.</p>
         </div>
     </div>
 </body>
-</html>
-
-`,
+</html>`
   }),
 };
 
@@ -318,7 +307,7 @@ const sendEmail = async (type, toEmail, data = {}) => {
 
   // Configure mail options
   const mailOptions = {
-    from: `"Wrokler" <${process.env.SMTP_USER}>`,
+    from: `"Workler" <${process.env.SMTP_USER}>`,
     to: toEmail,
     subject: emailContent.subject,
     text: emailContent.text,
