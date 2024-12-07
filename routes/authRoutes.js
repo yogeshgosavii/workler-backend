@@ -24,7 +24,43 @@ router.route('/user').get(protect, getUserDetails);
 router.route('/user/:userId').get(protect, getUserDetailsById);
 
 // User profile update with image handling
-router.route('/update-user').put(protect, upload, imageMiddleware, updateUserDetails);
+router.put(
+    '/update-user',
+    (req, res, next) => {
+      console.time('Total Request Time'); // Start overall request timer
+      console.time('Middleware Execution'); // Start middleware execution timer
+      next(); // Continue to the next middleware
+    },
+    protect, // Authentication middleware
+    (req, res, next) => {
+      console.timeEnd('Middleware Execution'); // End middleware execution timer
+      console.time('Image Upload'); // Start image upload timer
+      next();
+    },
+    upload, // File upload middleware
+    (req, res, next) => {
+      console.timeEnd('Image Upload'); // End image upload timer
+      console.time('Image Processing'); // Start image processing timer
+      next();
+    },
+    imageMiddleware, // Image processing middleware
+    (req, res, next) => {
+      console.timeEnd('Image Processing'); // End image processing timer
+      console.time('Request Processing'); // Start request processing timer
+      next();
+    },
+    async (req, res, next) => {
+      try {
+        await updateUserDetails(req, res);
+        console.timeEnd('Request Processing'); // End request processing timer
+        console.timeEnd('Total Request Time'); // End total request time timer
+
+      } catch (error) {
+        next(error);
+      }
+    },
+   
+  );
 
 // Test route for authentication
 router.route('/testAuth').get(testAuth);

@@ -83,29 +83,29 @@ export const imageMiddleware = async (req, res, next) => {
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
-  try {
-    if (!req.files.files || req.files.files.length === 0) {
-      return next();
-    }
+  // try {
+  //   if (!req.files.files || req.files.files.length === 0) {
+  //     return next();
+  //   }
 
-    const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
-      try {
-        return {
-          fileUrl: await uploadFileToFirebase(file.buffer, file.originalname, 'files'),
-          filename: file.originalname
-        };
-      } catch (error) {
-        console.error('Error processing file:', error.message);
-        throw new Error('File processing failed');
-      }
-    }));
+  //   const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
+  //     try {
+  //       return {
+  //         fileUrl: await uploadFileToFirebase(file.buffer, file.originalname, 'files'),
+  //         filename: file.originalname
+  //       };
+  //     } catch (error) {
+  //       console.error('Error processing file:', error.message);
+  //       throw new Error('File processing failed');
+  //     }
+  //   }));
 
-    req.filesUrls = uploadedFileUrls;
-    next();
-  } catch (error) {
-    console.error('Error during file upload:', error.message);
-    res.status(500).send('Error during file upload');
-  }
+  //   req.filesUrls = uploadedFileUrls;
+  //   next();
+  // } catch (error) {
+  //   console.error('Error during file upload:', error.message);
+  //   res.status(500).send('Error during file upload');
+  // }
 };
 
 export default {
