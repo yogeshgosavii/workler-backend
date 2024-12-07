@@ -6,7 +6,10 @@ export async function protect(req, res, next) {
   try {
     let token;
 
+
     console.log("body",req.body);
+      // console.time("Total Request Time"); // Start total timer
+
     
     // Extract token from header
     if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {

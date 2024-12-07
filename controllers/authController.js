@@ -302,7 +302,7 @@ export async function updateUserDetails(req, res) {
     };
 
     if (Object.keys(updates).length === 0) {
-      console.timeEnd("Total Request Time"); // End total timer on error
+      // console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(400).send("No valid fields to update");
     }
 
@@ -311,7 +311,7 @@ export async function updateUserDetails(req, res) {
     console.timeEnd("Database Update");
 
     if (!updatedUser) {
-      console.timeEnd("Total Request Time"); // End total timer on error
+      // console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(404).send("Failed to update user details");
     }
 
