@@ -34,30 +34,30 @@ const handleCreateInterview = (Model) => async (req, res) => {
   
 
     // Avoid sending a notification if the user comments on their own post
-    // if (userId) {
-    //   // Create a notification for the post author
-    //   const notificationData = {
-    //     userId: data.employeer, // Post author's ID
-    //     related_to: data.user, // Commenter’s user ID
-    //     notificationType: "interview", // Notification type
-    //     message: `${req.user.username} inerview setup`, // Notification message
-    //     contentId: data._id, // Link to the post
-    //   };
+    if (userId) {
+      // Create a notification for the post author
+      const notificationData = {
+        userId: data.user, // Post author's ID
+        related_to: data.employeer, // Commenter’s user ID
+        notificationType: "interview", // Notification type
+        message: `Your interview has been successfully scheduled.`, // Notification message
+        contentId: data._id, // Link to the post
+      };
 
-    //   // Call createNotification and handle the response
-    //   const notificationResult =
-    //     await notificationController.createNotification({
-    //       body: notificationData,
-    //     });
+      // Call createNotification and handle the response
+      const notificationResult =
+        await notificationController.createNotification({
+          body: notificationData,
+        });
 
-    //   if (!notificationResult.success) {
-    //     // Log the error or send a warning response if needed
-    //     console.error(notificationResult.error);
-    //   }
+      if (!notificationResult.success) {
+        // Log the error or send a warning response if needed
+        console.error(notificationResult.error);
+      }
 
-    //   await data.save();
-    //   res.status(201).json(data);
-    // }
+      await data.save();
+      res.status(201).json(data);
+    }
   } catch (error) {
     console.error("Error:", error);
     res.status(500).send("Server Error");

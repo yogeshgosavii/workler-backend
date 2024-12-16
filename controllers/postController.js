@@ -11,16 +11,21 @@ import { Notification } from "../models/notificationModule.js";
 // Create a new document
 const handleCreate = (Model) => async (req, res) => {
   try {
+
+    console.log("mentions",req.body)
     const data = new Model({
       ...req.body,
       images: req.images,
       user: req.user._id,
+      mentions : req.body.mentions?.split(",") || []
     });
     await data.save();
 
     // Use Promise.all to ensure all asynchronous operations complete
     await Promise.all(
       data.mentions?.map(async (mention) => {
+      console.log("com",mention,req.user._id)
+      if (mention.toString() !== req.user._id.toString()){
         const notificationData = {
           userId: mention, // User receiving the notification (parent comment author)
           related_to: req.user._id, // The user who made the reply
@@ -38,6 +43,7 @@ const handleCreate = (Model) => async (req, res) => {
         if (!notificationResult.success) {
           console.error("Notification creation error:", notificationResult.error);
         }
+       }
       })
     );
 

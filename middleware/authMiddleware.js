@@ -8,7 +8,7 @@ export async function protect(req, res, next) {
 
 
     console.log("body",req.body);
-      // console.time("Total Request Time"); // Start total timer
+      console.time("Total Request Time"); // Start total timer
 
     
     // Extract token from header

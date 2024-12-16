@@ -36,6 +36,7 @@ export const imageMiddleware = async (req, res, next) => {
         // Compress the image in parallel with the upload
         const compressedBuffer = await compressImage(image.buffer);
 
+        console.
         // Upload both the original and compressed images in parallel
         const [originalUrl, compressedUrl] = await Promise.all([
           uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Original upload
