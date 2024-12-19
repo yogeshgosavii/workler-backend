@@ -44,7 +44,7 @@ export const getPreference = async (req, res) => {
 // Update a preference by user ID
 export const updatePreference = async (req, res) => {
   const { userId } = req.params;
-  const { jobType, location, experienceLevel, industries } = req.body;
+  const { jobType, location, experienceLevel, industries ,roles } = req.body;
 
 //   if (salary && salary.min >= salary.max) {
 //     return res.status(400).json({ error: "Minimum salary should be less than maximum salary" });
@@ -56,7 +56,7 @@ console.log(location);
   try {
     const updatedPreference = await Preference.findOneAndUpdate(
       { user: userId },
-      { jobType, location, experienceLevel, industries },
+      { jobType, location, experienceLevel, industries ,roles },
       { new: true, runValidators: true }
     );
     

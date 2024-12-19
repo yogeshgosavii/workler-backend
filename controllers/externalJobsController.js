@@ -43,6 +43,7 @@ export const fetchJobsFromReed = async (query, limit = 10, page = 1) => {
     const params = queryIsValid
       ? {
           keywords: query,
+          location : "india",
           resultsToSkip: page * limit,
           resultsToTake: limit,
         }
