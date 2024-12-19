@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "apify-client": "^2.9.3",
-    "axios": "^1.7.7",
+    "axios": "^1.7.9",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -34,9 +34,10 @@
     "multer": "^1.4.5-lts.1",
     "node-fetch": "^3.3.2",
     "nodemailer": "^6.9.16",
+    "openai": "^4.76.3",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "puppeteer": "^23.5.1",
+    "puppeteer": "^23.10.4",
     "sharp": "^0.33.4",
     "workler-backend": "file:"
   },

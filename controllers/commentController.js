@@ -15,15 +15,44 @@ const handleAddComment = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Content is required" });
   }
 
+  console.log("bo",req.body);
+  
+
   // Save the comment
   const comment = new Comment({
     user: userId,
     post: postId,
     content,
+    mentions : req.body.mentions || [],
     parentComment: null, // This is a normal comment
   });
 
   await comment.save();
+
+   await Promise.all(
+        comment.mentions?.map(async (mention) => {
+        console.log("com",mention,req.user._id)
+        if (mention.toString() !== req.user._id.toString()){
+          const notificationData = {
+            userId: mention, // User receiving the notification (parent comment author)
+            related_to: req.user._id, // The user who made the reply
+            notificationType: "mention", // Notification type
+            actionId: comment._id, // Example hardcoded ObjectId
+            message: `${req.user.username} mentioned you in their comment`, // Custom message
+            contentId: comment._id, 
+          };
+  
+          // Create the notification using the notification controller
+          const notificationResult = await notificationController.createNotification({
+            body: notificationData,
+          });
+  
+          if (!notificationResult.success) {
+            console.error("Notification creation error:", notificationResult.error);
+          }
+         }
+        })
+      );
 
   // Fetch post details to find the post author
   const post = await Posts.findById(postId).populate('user', 'username');
@@ -80,17 +109,43 @@ const handleAddReply = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Parent comment not found" });
   }
 
-  console.log("parent",parentComment)
+  console.log("parent",parentComment,req.body)
 
   // Create a reply comment linked to the parent comment
   let replyComment = new Comment({
     user: userId,
     post: parentComment.post,
     content,
+    mentions : req.body.mentions,
     parentComment: parentComment._id,
   });
 
   await replyComment.save();
+
+  await Promise.all(
+    replyComment.mentions?.map(async (mention) => {
+    console.log("com",mention,req.user._id)
+    if (mention.toString() !== req.user._id.toString()){
+      const notificationData = {
+        userId: mention, // User receiving the notification (parent comment author)
+        related_to: req.user._id, // The user who made the reply
+        notificationType: "mention", // Notification type
+        actionId: replyComment._id, // Example hardcoded ObjectId
+        message: `${req.user.username} mentioned you in their comment`, // Custom message
+        contentId: replyComment._id, 
+      };
+
+      // Create the notification using the notification controller
+      const notificationResult = await notificationController.createNotification({
+        body: notificationData,
+      });
+
+      if (!notificationResult.success) {
+        console.error("Notification creation error:", notificationResult.error);
+      }
+     }
+    })
+  );
   
 
 
@@ -131,6 +186,12 @@ const handleGetComments = asyncHandler(async (req, res) => {
   const comments = await Comment.find({ post: postId })
   .populate("user", "username profileImage") // Populate the user of the comment
   .populate({
+    path: "mentions", // The field to populate
+    model: "User", // The model to use for populating
+    select:
+      "username personal_details company_details location profileImage",
+  })
+  .populate({
     path: "parentComment", // Specify the path for parentComment
     populate: { // Nested populate to get user of the parentComment
       path: "user", // Specify the user field in the parentComment
@@ -148,7 +209,13 @@ const handleGetReplies = asyncHandler(async (req, res) => {
 
   // Find replies to the specific comment
   const replies = await Comment.find({ parentComment: commentId })
-    .populate("user", "username profileImage");
+    .populate("user","username personal_details company_details location profileImage")
+    .populate({
+      path: "mentions", // The field to populate
+      model: "User", // The model to use for populating
+      select:
+        "username personal_details company_details location profileImage",
+    })
 
   res.json(replies);
 });
