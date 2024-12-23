@@ -19,6 +19,9 @@ import savedRoutes from "./routes/savedRoutes.js";
 import notificationRoutes from "./routes/notificationRoutes.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import scrapeRoutes from "./routes/scrapeRoutes.js";
+import newsRoutes from "./routes/newsRoutes.js";
+import cron from "node-cron";
+import { fetchAndStoreNews } from "./controllers/newsController.js";
 
 
 dotenv.config();
@@ -87,7 +90,14 @@ app.use("/api/saved", savedRoutes);
 app.use("/api/notification", notificationRoutes);
 app.use("/api/preference", preferenceRoutes);
 app.use("/api/scrape", scrapeRoutes);
+app.use("/api/news/", newsRoutes);
 
+
+// Schedule the job (daily at midnight)
+cron.schedule("0 0 * * *", () => {
+  console.log("Running scheduled news update...");
+  fetchAndStoreNews();
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

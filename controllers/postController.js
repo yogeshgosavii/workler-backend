@@ -86,8 +86,8 @@ const handleUserGetAll = (Model) => async (req, res) => {
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
         select:
-          "username personal_details company_details location profileImage",
-      });
+          "username personal_details company_details location profileImage bio",
+      })
 
     res.json(data);
   } catch (error) {
@@ -116,8 +116,8 @@ const handleGetPostByUserId = (Model) => async (req, res) => {
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
         select:
-          "username personal_details company_details location profileImage",
-      });
+          "username personal_details company_details location profileImage bio",
+      })
 
     res.json(data);
   } catch (error) {
@@ -149,10 +149,11 @@ const handleGetUserFollowingPosts = (PostModel,FollowingModel) => async (req, re
         select: "username personal_details company_details location profileImage",
       })
       .populate({
-        path: "mentions",
-        model: "User",
-        select: "username personal_details company_details location profileImage",
-      });
+        path: "mentions", // The field to populate
+        model: "User", // The model to use for populating
+        select:
+          "username personal_details company_details location profileImage bio",
+      })
 
     res.status(200).json(posts);
   } catch (error) {
@@ -245,8 +246,8 @@ const handleGetAll = (Model) => async (req, res) => {
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
         select:
-          "username personal_details company_details location profileImage",
-      });
+          "username personal_details company_details location profileImage bio",
+      })
     res.json(data);
   } catch (error) {
     console.error("Error:", error);
@@ -275,8 +276,8 @@ const handleGetById = (Model) => async (req, res) => {
         path: "mentions", // The field to populate
         model: "User", // The model to use for populating
         select:
-          "username personal_details company_details location profileImage",
-      });
+          "username personal_details company_details location profileImage bio",
+      })
 
     res.json(data);
   } catch (error) {

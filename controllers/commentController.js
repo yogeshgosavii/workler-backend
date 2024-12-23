@@ -184,18 +184,18 @@ const handleGetComments = asyncHandler(async (req, res) => {
 
   // Fetch all normal comments (parentComment is null) and their replies
   const comments = await Comment.find({ post: postId })
-  .populate("user", "username profileImage") // Populate the user of the comment
+  .populate("user", "username personal_details company_details location profileImage bio") // Populate the user of the comment
   .populate({
     path: "mentions", // The field to populate
     model: "User", // The model to use for populating
     select:
-      "username personal_details company_details location profileImage",
+      "username personal_details company_details location profileImage bio",
   })
   .populate({
     path: "parentComment", // Specify the path for parentComment
     populate: { // Nested populate to get user of the parentComment
       path: "user", // Specify the user field in the parentComment
-      select: "username profileImage" // Fields to retrieve from the user
+      select: "username personal_details company_details location profileImage bio" // Fields to retrieve from the user
     }
   });
 
