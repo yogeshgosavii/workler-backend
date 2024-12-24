@@ -4,6 +4,7 @@ import notificationController from "./notificationController.js";
 import { Job } from "../models/jobModel.js";
 import Follow from "../models/followModel.js";
 import { Notification } from "../models/notificationModule.js";
+import stopword from 'stopword';
 
 
 
@@ -223,6 +224,73 @@ const handleGetUserFollowingPosts = (PostModel,FollowingModel) => async (req, re
 // };
 
 
+// Get all posts for a specific keyword
+const handleGetPostByKeyword = (Model) => async (req, res) => {
+  const { keyword } = req.params;
+
+  const cleanKeyword = (inputKeyword) => {
+    const words = inputKeyword.split(' ');
+    const cleanedWords = stopword.removeStopwords(words);
+    return cleanedWords.join(' ');
+  };
+
+  const cleanedKeyword = cleanKeyword(keyword);
+
+  if (!cleanedKeyword.trim()) {
+    return res.status(400).json({ error: "Keyword cannot be empty" });
+  }
+
+  try {
+    const posts = await Model.aggregate([
+      // Lookup to populate 'user'
+      {
+        $lookup: {
+          from: "users",
+          localField: "user",
+          foreignField: "_id",
+          as: "user",
+        },
+      },
+      { $unwind: "$user" },
+      // Lookup to populate 'mentions'
+      {
+        $lookup: {
+          from: "users",
+          localField: "mentions",
+          foreignField: "_id",
+          as: "mentions",
+        },
+      },
+      // Lookup to populate 'jobs'
+      {
+        $lookup: {
+          from: "jobs", // Ensure this matches the Job collection name
+          localField: "jobs",
+          foreignField: "_id",
+          as: "jobs",
+        },
+      },
+      // Match against the cleaned keyword
+      {
+        $match: {
+          $or: [
+            { content: { $regex: cleanedKeyword, $options: "i" } },
+            { "user.username": { $regex: cleanedKeyword, $options: "i" } },
+            { "mentions.username": { $regex: cleanedKeyword, $options: "i" } },
+            { hashTags: { $regex: cleanedKeyword, $options: "i" } },
+          ],
+        },
+      },
+    ]);
+
+    res.json(posts);
+  } catch (error) {
+    console.error("Error while searching posts by keyword:", { keyword, cleanedKeyword, error });
+    res.status(500).send("Server Error");
+  }
+};
+
+
 
 
 
@@ -359,4 +427,5 @@ export const getPostById = asyncHandler(handleGetById(Post)); // New export
 export const updatePost = asyncHandler(handleUpdate(Post));
 export const deletePost = asyncHandler(handleDelete(Post));
 export const getPostByUserId = asyncHandler(handleGetPostByUserId(Post));
+export const getPostByKeyword = asyncHandler(handleGetPostByKeyword(Post));
 
