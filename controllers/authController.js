@@ -280,6 +280,8 @@ export async function updateUserDetails(req, res) {
       tags,
       saved_jobs,
       saved_profiles,
+      reports
+
     } = req.body;
 
     console.log("Request Body:", req.body);
@@ -299,6 +301,8 @@ export async function updateUserDetails(req, res) {
       ...(company_details && typeof company_details === "object" && { company_details }),
       ...(saved_jobs && Array.isArray(saved_jobs) && { saved_jobs }),
       ...(saved_profiles && Array.isArray(saved_profiles) && { saved_profiles }),
+      ...(reports && Array.isArray(reports) && { reports }),
+
     };
 
     if (Object.keys(updates).length === 0) {

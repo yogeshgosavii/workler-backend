@@ -20,6 +20,7 @@ import notificationRoutes from "./routes/notificationRoutes.js";
 import preferenceRoutes from "./routes/preferenceRoutes.js";
 import scrapeRoutes from "./routes/scrapeRoutes.js";
 import newsRoutes from "./routes/newsRoutes.js";
+import reportRoutes from "./routes/reportRoutes.js";
 import cron from "node-cron";
 import { fetchAndStoreNews } from "./controllers/newsController.js";
 
@@ -31,7 +32,7 @@ app.use(express.json());
 
 // CORS configuration
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://workler.netlify.app", "https://workler.in"],
+  origin: ["http://localhost:5173","http://localhost:5174", "https://workler.netlify.app", "https://workler.in"],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
@@ -91,6 +92,8 @@ app.use("/api/notification", notificationRoutes);
 app.use("/api/preference", preferenceRoutes);
 app.use("/api/scrape", scrapeRoutes);
 app.use("/api/news/", newsRoutes);
+app.use("/api/report/", reportRoutes);
+
 
 
 // Schedule the job (daily at midnight)
