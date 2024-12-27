@@ -29,34 +29,36 @@ const handleAddComment = asyncHandler(async (req, res) => {
 
   await comment.save();
 
-   await Promise.all(
-        comment.mentions?.map(async (mention) => {
-        console.log("com",mention,req.user._id)
-        if (mention.toString() !== req.user._id.toString()){
-          const notificationData = {
-            userId: mention, // User receiving the notification (parent comment author)
-            related_to: req.user._id, // The user who made the reply
-            notificationType: "mention", // Notification type
-            actionId: comment._id, // Example hardcoded ObjectId
-            message: `${req.user.username} mentioned you in their comment`, // Custom message
-            contentId: comment._id, 
-          };
-  
-          // Create the notification using the notification controller
-          const notificationResult = await notificationController.createNotification({
-            body: notificationData,
-          });
-  
-          if (!notificationResult.success) {
-            console.error("Notification creation error:", notificationResult.error);
-          }
-         }
-        })
-      );
+ 
 
   // Fetch post details to find the post author
   const post = await Posts.findById(postId).populate('user', 'username');
   const postAuthorId = post.user._id;
+
+  await Promise.all(
+    comment.mentions?.map(async (mention) => {
+    console.log("com",mention,req.user._id)
+    if (mention.toString() !== req.user._id.toString()){
+      const notificationData = {
+        userId: mention, // User receiving the notification (parent comment author)
+        related_to: req.user._id, // The user who made the reply
+        notificationType: "comment", // Notification type
+        actionId: comment._id, // Example hardcoded ObjectId
+        message: `${req.user.username} mentioned you in their comment`, // Custom message
+        contentId: postId, 
+      };
+
+      // Create the notification using the notification controller
+      const notificationResult = await notificationController.createNotification({
+        body: notificationData,
+      });
+
+      if (!notificationResult.success) {
+        console.error("Notification creation error:", notificationResult.error);
+      }
+     }
+    })
+  );
 
   // Avoid sending a notification if the user comments on their own post
   if (!postAuthorId.equals(userId)) {

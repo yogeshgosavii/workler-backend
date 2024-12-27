@@ -19,7 +19,6 @@ export async function getAllReports(req, res) {
               "username personal_details company_details location profileImage",
           })
         ;
-        console.log("rep",reports)
         res.json(reports);
     } catch (err) {
         res.status(500).json({ message: 'Error fetching reports: ' + err.message });
@@ -79,9 +78,11 @@ export async function updateReport(req, res) {
 // Delete a report
 export async function deleteReport(req, res) {
     try {
-        await res.report.remove();
+        const { id } = req.params;
+        await Report.findByIdAndDelete(id);
         res.json({ message: 'Deleted Report' });
     } catch (err) {
+        console.log(err.message)
         res.status(500).json({ message: 'Error deleting report: ' + err.message });
     }
 }
