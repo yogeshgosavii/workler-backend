@@ -1,4 +1,3 @@
-import sharp from 'sharp';
 import { storage } from '../firebaseConfig.js';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -36,8 +35,8 @@ export const imageMiddleware = async (req, res, next) => {
         // Compress the image in parallel with the upload
         const compressedBuffer = await compressImage(image.buffer);
 
-        console.
-        // Upload both the original and compressed images in parallel
+        console.log(`Compressed image size: ${compressedBuffer.length / 1024} KB`);
+        console.log(`Compressed image size: ${compressedBuffer.length / 1024} KB`);
         const [originalUrl, compressedUrl] = await Promise.all([
           uploadFileToFirebase(image.buffer, image.originalname, 'images/original'), // Original upload
           uploadFileToFirebase(compressedBuffer, `compressed_${image.originalname}`, 'images/compressed'), // Compressed upload
@@ -65,31 +64,30 @@ export const imageMiddleware = async (req, res, next) => {
 
 // Middleware for handling general file uploads
 export const fileMiddleware = async (req, res, next) => {
-  // try {
-  //   if (!req.files.files || req.files.files.length === 0) {
-  //     return next();
-  //   }
+  try {
+    if (!req.files.files || req.files.files.length === 0) {
+      return next();
+    }
 
-  //   const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
-  //     try {
-  //       return {
-  //         fileUrl: await uploadFileToFirebase(file.buffer, file.originalname, 'files'),
-  //         filename: file.originalname
-  //       };
-  //     } catch (error) {
-  //       console.error('Error processing file:', error.message);
-  //       throw new Error('File processing failed');
-  //     }
-  //   }));
+    const uploadedFileUrls = await Promise.all(req.files.files.map(async (file) => {
+      try {
+        return {
+          fileUrl: await uploadFileToFirebase(file.buffer, file.originalname, 'files'),
+          filename: file.originalname
+        };
+      } catch (error) {
+        console.error('Error processing file:', error.message);
+        throw new Error('File processing failed');
+      }
+    }));
 
-  //   req.filesUrls = uploadedFileUrls;
-  //   next();
-  // } catch (error) {
-  //   console.error('Error during file upload:', error.message);
-  //   res.status(500).send('Error during file upload');
-  // }
+    req.filesUrls = uploadedFileUrls;
+    next();
+  } catch (error) {
+    console.error('Error during file upload:', error.message);
+    res.status(500).send('Error during file upload');
+  }
 };
-
 export default {
   imageMiddleware,
   fileMiddleware

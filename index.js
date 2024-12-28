@@ -32,7 +32,7 @@ app.use(express.json());
 
 // CORS configuration
 const corsOptions = {
-  origin: ["https://workler.netlify.app", "https://workler.in"],
+  origin: ["https://workler.netlify.app","http://localhost:5173", "https://workler.in"],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
