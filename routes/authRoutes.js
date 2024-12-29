@@ -20,8 +20,8 @@ router.post('/reset-password', resetPassword);  // Reset password with token
 router.get('/validate-reset-token/:token', validateResetToken);  // Reset password with token
 
 // User information routes
-router.route('/user').get(protect, getUserDetails);
-router.route('/user/:userId').get(protect, getUserDetailsById);
+router.route('/user').get( getUserDetails);
+router.route('/user/:userId').get( getUserDetailsById);
 
 // User profile update with image handling
 router.put(
