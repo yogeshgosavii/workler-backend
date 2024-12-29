@@ -257,12 +257,9 @@ export const resetPassword = async (req, res) => {
 // import User from "../models/User.js"; // Replace with your actual User model import
 
 export async function updateUserDetails(req, res) {
-  // console.time("Total Request Time"); // Start total timer
-
   try {
     const user = req.user; // Assumes `req.user` is populated by middleware
     if (!user) {
-      // console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(404).send("User not found");
     }
 
@@ -280,8 +277,8 @@ export async function updateUserDetails(req, res) {
       tags,
       saved_jobs,
       saved_profiles,
-      reports
-
+      reports,
+      profileImage, // Includes profileImage for removal or update
     } = req.body;
 
     console.log("Request Body:", req.body);
@@ -296,37 +293,50 @@ export async function updateUserDetails(req, res) {
       ...(portfolioLink && { portfolioLink: portfolioLink.trim() }),
       ...(tags && Array.isArray(tags) && { tags }),
       ...(bio && { bio: bio.trim() }),
-      ...(req.images && { profileImage: req.images }),
+      ...((req.images || profileImage) ?{ profileImage: req.images } :{profileImage: null}), // Handle image upload
       ...(personal_details && typeof personal_details === "object" && { personal_details }),
       ...(company_details && typeof company_details === "object" && { company_details }),
       ...(saved_jobs && Array.isArray(saved_jobs) && { saved_jobs }),
       ...(saved_profiles && Array.isArray(saved_profiles) && { saved_profiles }),
       ...(reports && Array.isArray(reports) && { reports }),
-
     };
 
-    if (Object.keys(updates).length === 0) {
-      // console.timeEnd("Total Request Time"); // End total timer on error
+    // Handle profileImage removal explicitly
+    if (profileImage === null) {
+      updates.profileImage = null; // Optional for client-side consistency
+    }
+
+    // Separate operation for unsetting fields
+    const unsetFields = {};
+    if (profileImage === null) {
+      unsetFields.profileImage = "";
+    }
+
+    const updateOptions = {
+      $set: updates,
+      ...(Object.keys(unsetFields).length > 0 && { $unset: unsetFields }),
+    };
+
+    if (Object.keys(updates).length === 0 && Object.keys(unsetFields).length === 0) {
       return res.status(400).send("No valid fields to update");
     }
 
     console.time("Database Update");
-    const updatedUser = await User.findByIdAndUpdate(user._id, { $set: updates }, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(user._id, updateOptions, { new: true });
     console.timeEnd("Database Update");
 
     if (!updatedUser) {
-      // console.timeEnd("Total Request Time"); // End total timer on error
       return res.status(404).send("Failed to update user details");
     }
 
-    // console.timeEnd("Total Request Time"); // End total timer on success
     res.json(updatedUser);
   } catch (error) {
-    // console.timeEnd("Total Request Time"); // End total timer on error
     console.error("Error updating user details:", error.message, error.stack);
     res.status(500).send("Error updating user details");
   }
 }
+
+
 
 
 
