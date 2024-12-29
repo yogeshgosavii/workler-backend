@@ -6,8 +6,8 @@ import { createFollow, getFollowers, getFollowing, unfollow } from '../controlle
 
 
 router.post('/create-follow',protect, createFollow);
-router.get('/get-followers/:userId',protect, getFollowers);
-router.get('/get-following/:userId',protect, getFollowing);
+router.get('/get-followers/:userId', getFollowers);
+router.get('/get-following/:userId', getFollowing);
 router.delete('/unfollow/:userId/:followingId',protect, unfollow);
 
 
