@@ -15,7 +15,10 @@ const compressImage = async (imageBuffer) => {
 
 // Middleware for efficient image upload with parallel processing
 export const imageMiddleware = async (req, res, next) => {
+  console.log("hello")
   try {
+    console.log("req",req.files)
+
     if (!req.files || !req.files.files || req.files.files.length === 0) {
       return next();
     }

@@ -1,5 +1,6 @@
 
 import { Schema, model } from 'mongoose';
+import imageSchema from './imageModel.js';
 
 const projectSchema = new Schema({
   user: {
@@ -11,7 +12,8 @@ const projectSchema = new Schema({
   project_description: String,
   start_date:Date,
   end_date:Date,
-  technologies : [String],
+  logo : { type: imageSchema , default: null},
+  technologies : { type: [String]} ,
   url : String
  });
 

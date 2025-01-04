@@ -6,8 +6,14 @@ import WorkExperience from '../models/workExperienceModel.js';
 
 // Helper function to handle async/await and error responses
 const handleCreate = (Model) => async (req, res) => {
+
+  console.log("img",req.images )
   try {
-    const data = new Model({ ...req.body, user: req.user._id });
+    const data = new Model({ 
+      ...req.body,
+      ...(Model === ProjectDetails ? { logo: req.images || null } : {}),
+      user: req.user._id 
+    });
     await data.save();
     res.status(201).json(data);
   } catch (error) {
@@ -36,6 +42,16 @@ const handleUpdate = (Model) => async (req, res) => {
     }
 
     Object.assign(data, req.body);
+    if (Model === ProjectDetails) {
+      if(req.images) {
+        data.logo = req.images;
+      }
+      console.log("data",data); 
+      if (typeof data.technologies[0] === 'string' && data.technologies[0].includes(',') && data.technologies.length === 1) {
+        data.technologies = data.technologies[0].split(",");
+      }
+    }
+
     const updatedData = await data.save();
     res.json(updatedData);
   } catch (error) {

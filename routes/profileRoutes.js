@@ -7,8 +7,13 @@ import {
   addWorkExperience, getWorkExperience, updateWorkExperience, deleteWorkExperience,
   getQualificationsById,
 } from '../controllers/profileController.js';
+import { imageMiddleware } from '../middleware/docMiddleware.js';
+import customUpload from '../middleware/uploadMiddleware.js';
+
 
 const router = express.Router();
+const upload = customUpload(1);  // Limit file upload to 1 file
+
 
 // Routes for Skills
 router.route('/skills')
@@ -32,11 +37,11 @@ router.route('/education/:id')
 
 // Routes for Project Details
 router.route('/projectDetails')
-  .post(protect, addProjectDetails)
+  .post(protect,upload,imageMiddleware,  addProjectDetails)
   .get(protect, getProjectDetails);
 
 router.route('/projectDetails/:id')
-  .put(protect, updateProjectDetails)
+  .put(protect,upload,imageMiddleware, updateProjectDetails)
   .delete(protect, deleteProjectDetails);
 
 // Routes for Work Experience
