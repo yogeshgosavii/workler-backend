@@ -43,12 +43,12 @@ const handleUpdate = (Model) => async (req, res) => {
 
     Object.assign(data, req.body);
     if (Model === ProjectDetails) {
-      if(req.images) {
+      if (req.images) {
         data.logo = req.images;
       }
-      console.log("data",data); 
-      if (typeof data.technologies[0] === 'string' && data.technologies[0].includes(',') && data.technologies.length === 1) {
-        data.technologies = data.technologies[0].split(",");
+
+      if (typeof data.technologies === 'string' && data.technologies.includes(',')) {
+        data.technologies = data.technologies.split(',');
       }
     }
 
@@ -59,6 +59,7 @@ const handleUpdate = (Model) => async (req, res) => {
     res.status(500).send('Server Error');
   }
 };
+
 
 const handleDelete = (Model) => async (req, res) => {
   try {
