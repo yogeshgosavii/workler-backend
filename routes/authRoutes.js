@@ -23,6 +23,7 @@ router.get('/validate-reset-token/:token', validateResetToken);  // Reset passwo
 router.route('/user').get( getUserDetails);
 router.route('/user/:userId').get( getUserDetailsById);
 
+
 // User profile update with image handling
 router.put(
     '/update-user',

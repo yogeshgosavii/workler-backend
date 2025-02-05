@@ -5,6 +5,8 @@ import User from "../models/userModel.js";
 import { jwtSecret } from "../config.js";
 import emailController from "./emailController.js";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
+
 dotenv.config();
 
 // Destructure methods for convenience
@@ -357,10 +359,39 @@ export async function getUserDetails(req, res) {
 }
 
 // Function to get user details by ID
+
 export async function getUserDetailsById(req, res) {
   try {
     const userId = req.params.userId;
-    const user = await User.findById(userId)
+    let user = null;
+
+    // Check if userId is a valid MongoDB ObjectId
+    if (mongoose.Types.ObjectId.isValid(userId)) {
+      user = await User.findById(userId).select("-password").populate("posts").exec();
+    }
+
+    // If not found by ObjectId, check by username
+    if (!user) {
+      user = await User.findOne({ username: userId }).select("-password").populate("posts").exec();
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json(user);
+  } catch (error) {
+    console.error(`Error fetching user details for ID: ${req.params.userId}`, error);
+    res.status(500).json({ message: "Error fetching user details" });
+  }
+}
+
+
+
+export async function getUserDetailsByUserame(req, res) {
+  try {
+    const username = req.params.username;
+    const user = await User.find({ username: username })
       .select("-password")
       .populate("posts");
     if (!user) {
